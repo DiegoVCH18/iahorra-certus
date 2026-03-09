@@ -1,0 +1,201 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - uid: string (required, immutable) - User ID
+    //   - name: string (required, max 100 chars) - User name
+    //   - ageProfile: string (optional, enum: 'niño', 'joven', 'adulto', 'emprendedor')
+    //   - savedAmount: number (required, >= 0) - Current saved amount
+    //   - completedCourses: list of strings (optional)
+    //   - createdAt: timestamp (required, immutable)
+    //   - updatedAt: timestamp (required)
+    //
+    // Collection: savings
+    // Document ID: {savingId}
+    // Fields:
+    //   - userId: string (required, immutable) - Owner ID
+    //   - amount: number (required, > 0) - Amount saved
+    //   - comment: string (optional, max 200 chars) - Description
+    //   - goalId: string (optional, max 100 chars) - Target goal ID
+    //   - date: string (required, immutable)
+    //
+    // Collection: goals
+    // Document ID: {goalId}
+    // Fields:
+    //   - userId: string (required, immutable) - Owner ID
+    //   - name: string (required, max 200 chars) - Goal name
+    //   - targetAmount: number (required, > 0) - Target amount
+    //   - currentAmount: number (required, >= 0) - Current saved amount
+    //   - status: string (required, enum: 'active', 'completed')
+    //   - createdAt: timestamp (required, immutable)
+    //   - updatedAt: timestamp (required)
+    //
+    // Collection: chats
+    // Document ID: {chatId}
+    // Fields:
+    //   - userId: string (required, immutable) - Owner ID
+    //   - role: string (required, enum: 'user', 'model')
+    //   - text: string (required, max 2000 chars)
+    //   - timestamp: string (required, immutable)
+    //
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function uidUnchanged() {
+      return !('uid' in request.resource.data) || request.resource.data.uid == request.auth.uid;
+    }
+    
+    function uidNotModified() {
+      return !('uid' in request.resource.data) || 
+             (!('uid' in resource.data)) || 
+             (request.resource.data.uid == resource.data.uid);
+    }
+    
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+    
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+    
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
+    
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() >= minLen &&
+              request.resource.data[field].size() <= maxLen);
+    }
+    
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    function isValidList(list, maxSize) {
+      return list is list && list.size() <= maxSize;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    
+    function isValidUser(data) {
+      return data.savedAmount is number && data.savedAmount >= 0;
+    }
+    
+    function isValidSaving(data) {
+      return hasOnlyAllowedFields(['userId', 'amount', 'comment', 'date', 'goalId']) &&
+             data.userId is string &&
+             data.amount is number && data.amount > 0 &&
+             data.date is string &&
+             (!('comment' in data) || data.comment is string) &&
+             (!('goalId' in data) || data.goalId is string);
+    }
+
+    function isValidGoal(data) {
+      return hasOnlyAllowedFields(['userId', 'name', 'targetAmount', 'currentAmount', 'status', 'createdAt', 'updatedAt']) &&
+             data.userId is string &&
+             validStringLength('name', 1, 200) &&
+             data.targetAmount is number && data.targetAmount > 0 &&
+             data.currentAmount is number && data.currentAmount >= 0 &&
+             data.status in ['active', 'completed'];
+    }
+
+    function isValidChatMessage(data) {
+      return hasOnlyAllowedFields(['userId', 'role', 'text', 'timestamp']) &&
+             data.userId is string &&
+             data.role in ['user', 'model'] &&
+             validStringLength('text', 1, 2000) &&
+             data.timestamp is string;
+    }
+
+    function isValidBudget(data) {
+      return hasOnlyAllowedFields(['userId', 'fixedIncome', 'variableIncome', 'fixedExpenses', 'variableExpenses', 'updatedAt']) &&
+             data.userId is string &&
+             data.fixedIncome is number && data.fixedIncome >= 0 &&
+             data.variableIncome is number && data.variableIncome >= 0 &&
+             data.fixedExpenses is number && data.fixedExpenses >= 0 &&
+             data.variableExpenses is number && data.variableExpenses >= 0;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && 
+                       isValidUser(request.resource.data) && 
+                       uidUnchanged();
+      allow update: if isOwner(userId) && 
+                       isValidUser(request.resource.data) && 
+                       uidNotModified() &&
+                       (!('createdAt' in resource.data) || areImmutableFieldsUnchanged(['createdAt']));
+      allow delete: if false; // Users cannot be deleted directly from client
+    }
+    
+    match /savings/{savingId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       isValidSaving(request.resource.data);
+      allow update: if false; // Savings are immutable
+      allow delete: if false; // Savings cannot be deleted
+    }
+
+    match /goals/{goalId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       isValidGoal(request.resource.data);
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == request.auth.uid &&
+                       isValidGoal(request.resource.data) &&
+                       areImmutableFieldsUnchanged(['createdAt', 'userId']);
+      allow delete: if false; // Goals cannot be deleted
+    }
+
+    match /chats/{chatId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       isValidChatMessage(request.resource.data);
+      allow update: if false; // Chats are immutable
+      allow delete: if false; // Chats cannot be deleted
+    }
+
+    match /budgets/{budgetId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       isValidBudget(request.resource.data);
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       request.resource.data.userId == request.auth.uid &&
+                       isValidBudget(request.resource.data) &&
+                       areImmutableFieldsUnchanged(['userId']);
+      allow delete: if false; // Budgets cannot be deleted
+    }
+  }
+}

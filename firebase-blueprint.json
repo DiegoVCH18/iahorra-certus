@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Perfil del usuario de IAhorra",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "ID del usuario" },
+        "name": { "type": "string", "description": "Nombre del usuario" },
+        "ageProfile": { "type": "string", "enum": ["niño", "joven", "adulto", "emprendedor", null] },
+        "savedAmount": { "type": "number", "description": "Monto ahorrado actual" },
+        "completedCourses": { 
+          "type": "array", 
+          "items": { "type": "string" },
+          "description": "Lista de IDs de cursos completados" 
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "savedAmount", "createdAt", "updatedAt"]
+    },
+    "SavingRecord": {
+      "title": "SavingRecord",
+      "description": "Registro de ahorro individual",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "ID del usuario dueño del registro" },
+        "amount": { "type": "number", "description": "Monto ahorrado" },
+        "comment": { "type": "string", "description": "Descripción del ahorro" },
+        "goalId": { "type": "string", "description": "ID de la meta a la que se destina el ahorro" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "amount", "date"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "Meta financiera del usuario",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "ID del usuario dueño de la meta" },
+        "name": { "type": "string", "description": "Nombre de la meta" },
+        "targetAmount": { "type": "number", "description": "Monto objetivo" },
+        "currentAmount": { "type": "number", "description": "Monto ahorrado actual" },
+        "status": { "type": "string", "enum": ["active", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "targetAmount", "currentAmount", "status", "createdAt", "updatedAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Mensaje del chat con IAhorra",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "ID del usuario" },
+        "role": { "type": "string", "enum": ["user", "model"] },
+        "text": { "type": "string", "description": "Contenido del mensaje" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "role", "text", "timestamp"]
+    },
+    "Budget": {
+      "title": "Budget",
+      "description": "Presupuesto del usuario",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "ID del usuario" },
+        "fixedIncome": { "type": "number", "description": "Ingresos fijos" },
+        "variableIncome": { "type": "number", "description": "Ingresos variables" },
+        "fixedExpenses": { "type": "number", "description": "Gastos fijos" },
+        "variableExpenses": { "type": "number", "description": "Gastos variables" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "fixedIncome", "variableIncome", "fixedExpenses", "variableExpenses", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Almacena los perfiles de los usuarios"
+    },
+    "/savings/{savingId}": {
+      "schema": { "$ref": "#/entities/SavingRecord" },
+      "description": "Almacena el historial de ahorros de los usuarios"
+    },
+    "/goals/{goalId}": {
+      "schema": { "$ref": "#/entities/Goal" },
+      "description": "Almacena las metas financieras de los usuarios"
+    },
+    "/chats/{chatId}": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Almacena el historial de chat de los usuarios"
+    },
+    "/budgets/{budgetId}": {
+      "schema": { "$ref": "#/entities/Budget" },
+      "description": "Almacena el presupuesto de los usuarios"
+    }
+  }
+}

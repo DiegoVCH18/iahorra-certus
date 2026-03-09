@@ -130,12 +130,16 @@ service cloud.firestore {
     }
 
     function isValidBudget(data) {
-      return hasOnlyAllowedFields(['userId', 'fixedIncome', 'variableIncome', 'fixedExpenses', 'variableExpenses', 'updatedAt']) &&
+      return hasOnlyAllowedFields(['userId', 'fixedIncome', 'variableIncome', 'fixedExpenses', 'variableExpenses', 'fixedIncomeItems', 'variableIncomeItems', 'fixedExpensesItems', 'variableExpensesItems', 'updatedAt']) &&
              data.userId is string &&
              data.fixedIncome is number && data.fixedIncome >= 0 &&
              data.variableIncome is number && data.variableIncome >= 0 &&
              data.fixedExpenses is number && data.fixedExpenses >= 0 &&
-             data.variableExpenses is number && data.variableExpenses >= 0;
+             data.variableExpenses is number && data.variableExpenses >= 0 &&
+             (!('fixedIncomeItems' in data) || data.fixedIncomeItems is list) &&
+             (!('variableIncomeItems' in data) || data.variableIncomeItems is list) &&
+             (!('fixedExpensesItems' in data) || data.fixedExpensesItems is list) &&
+             (!('variableExpensesItems' in data) || data.variableExpensesItems is list);
     }
 
     // ===============================================================
@@ -196,6 +200,11 @@ service cloud.firestore {
                        isValidBudget(request.resource.data) &&
                        areImmutableFieldsUnchanged(['userId']);
       allow delete: if false; // Budgets cannot be deleted
+    }
+
+    match /public_stats/{statId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
     }
   }
 }

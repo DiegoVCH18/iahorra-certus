@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
+import ShareAchievement from '@/components/ShareAchievement';
 
 interface SavingRecord {
   id: string;
@@ -157,6 +158,16 @@ export default function Progress() {
                           <div className="bg-certus-magenta h-3 rounded-full transition-all duration-1000" style={{ width: `${progress}%` }}></div>
                         </div>
                         <p className="text-xs text-right text-certus-magenta font-bold">{progress}% completado</p>
+
+                        {goal.status === 'completed' && (
+                          <div className="mt-4 pt-4 border-t border-gray-100">
+                            <ShareAchievement 
+                              title={goal.name} 
+                              subtitle="¡He completado mi meta de ahorro!" 
+                              type="goal" 
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

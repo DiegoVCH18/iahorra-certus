@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useAppContext } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
 import { Baby, Backpack, Briefcase, Rocket, Target, BookOpen, ShieldAlert, CreditCard, PieChart, User as UserIcon } from 'lucide-react';
+import Footer from '@/components/Footer';
 
 const GOALS_BY_AGE: Record<string, { title: string, icon: React.ReactNode }[]> = {
   'niño': [
@@ -98,7 +99,7 @@ export default function Onboarding() {
         <p className="text-sm font-display text-certus-blue font-semibold mb-1">Paso {step} de 3</p>
       </div>
 
-      <div className="flex-1 px-6 overflow-y-auto pb-24">
+      <div className="flex-1 px-6 overflow-y-auto pb-48">
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div
@@ -170,10 +171,11 @@ export default function Onboarding() {
         <button 
           onClick={handleNext}
           disabled={(step === 1 && !age) || (step === 2 && !habit) || (step === 3 && !goal) || loading}
-          className="w-full bg-certus-magenta text-white font-display font-bold py-4 rounded-xl hover:bg-opacity-90 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-certus-magenta text-white font-display font-bold py-4 rounded-xl hover:bg-opacity-90 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed mb-4"
         >
           {loading ? 'GUARDANDO...' : (step === 3 ? '¡EMPEZAR!' : 'Siguiente')}
         </button>
+        <Footer />
       </div>
     </div>
     </div>

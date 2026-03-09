@@ -32,7 +32,7 @@ export default function Chat() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [initialPromptHandled, setInitialPromptHandled] = useState(false);
+  const initialPromptHandledRef = useRef(false);
 
   const activeGoal = goals.find(g => g.status === 'active') || goals[0];
   const activeGoalName = activeGoal?.name || 'Aprender a ahorrar';
@@ -264,14 +264,14 @@ export default function Chat() {
   };
 
   useEffect(() => {
-    if (location.state?.initialPrompt && !initialPromptHandled && firebaseUser) {
+    if (location.state?.initialPrompt && !initialPromptHandledRef.current && firebaseUser) {
       const prompt = location.state.initialPrompt;
-      setInitialPromptHandled(true);
+      initialPromptHandledRef.current = true;
       // Clear state to avoid re-triggering
       window.history.replaceState({}, document.title);
       handleSend(prompt);
     }
-  }, [location.state, initialPromptHandled, firebaseUser]);
+  }, [location.state, firebaseUser]);
 
   return (
     <div className="flex flex-col flex-1 bg-white">

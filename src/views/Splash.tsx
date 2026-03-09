@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { PiggyBank, MessageSquare, PieChart, ShieldAlert, ArrowRight } from 'lucide-react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/firebase';
+import Footer from '@/components/Footer';
 
 const STEPS = [
   {
@@ -33,6 +36,28 @@ const STEPS = [
 export default function Splash() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
+  const [stats, setStats] = useState({ totalUsers: 0, totalSavings: 0, totalGoals: 0 });
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'public_stats', 'global'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setStats({
+          totalUsers: data.totalUsers || 0,
+          totalSavings: data.totalSavings || 0,
+          totalGoals: data.totalGoals || 0
+        });
+      } else {
+        // Fallback if document doesn't exist yet
+        setStats({
+          totalUsers: 0,
+          totalSavings: 0,
+          totalGoals: 0
+        });
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const nextStep = () => {
     if (currentStep < STEPS.length - 1) {
@@ -84,6 +109,26 @@ export default function Splash() {
           
           <h2 className="text-certus-cyan font-semibold text-lg mb-4">{STEPS[currentStep].subtitle}</h2>
           <p className="text-white/80 leading-relaxed">{STEPS[currentStep].description}</p>
+          
+          {currentStep === 0 && (
+            <div className="mt-6 bg-white/10 backdrop-blur-md rounded-2xl p-4 w-full border border-white/20">
+              <p className="text-xs text-certus-cyan font-bold uppercase tracking-wider mb-3">Impacto en tiempo real</p>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div>
+                  <div className="text-xl font-display font-bold text-white">{stats.totalUsers}</div>
+                  <div className="text-[9px] uppercase text-white/70">Usuarios</div>
+                </div>
+                <div className="border-l border-r border-white/20">
+                  <div className="text-xl font-display font-bold text-white">{stats.totalSavings}</div>
+                  <div className="text-[9px] uppercase text-white/70">Ahorros</div>
+                </div>
+                <div>
+                  <div className="text-xl font-display font-bold text-white">{stats.totalGoals}</div>
+                  <div className="text-[9px] uppercase text-white/70">Metas</div>
+                </div>
+              </div>
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
 
@@ -115,13 +160,7 @@ export default function Splash() {
           </button>
         )}
         
-        {currentStep === 0 && (
-          <p className="text-center text-[10px] text-white/60 mt-2">
-            <a href="https://www.linkedin.com/in/diego-armando-vasquez/" target="_blank" rel="noopener noreferrer" className="hover:text-certus-cyan transition-colors">
-              Desarrollado por: Ing Diego Vasquez Chavez CIP: 337613
-            </a>
-          </p>
-        )}
+        <Footer light />
       </div>
     </div>
   );

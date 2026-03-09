@@ -69,6 +69,10 @@
         "variableIncome": { "type": "number", "description": "Ingresos variables" },
         "fixedExpenses": { "type": "number", "description": "Gastos fijos" },
         "variableExpenses": { "type": "number", "description": "Gastos variables" },
+        "fixedIncomeItems": { "type": "array", "items": { "type": "object" }, "description": "Lista de ingresos fijos" },
+        "variableIncomeItems": { "type": "array", "items": { "type": "object" }, "description": "Lista de ingresos variables" },
+        "fixedExpensesItems": { "type": "array", "items": { "type": "object" }, "description": "Lista de gastos fijos" },
+        "variableExpensesItems": { "type": "array", "items": { "type": "object" }, "description": "Lista de gastos variables" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "fixedIncome", "variableIncome", "fixedExpenses", "variableExpenses", "updatedAt"]

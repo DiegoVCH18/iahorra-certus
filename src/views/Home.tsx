@@ -1,8 +1,9 @@
 import { useAppContext } from '@/context/AppContext';
-import { PiggyBank, MessageSquare, PieChart, BookOpen, ShieldAlert, TrendingUp, User, Lightbulb, Plus, X } from 'lucide-react';
+import { PiggyBank, MessageSquare, PieChart, BookOpen, ShieldAlert, TrendingUp, User, Lightbulb, Plus, X, Users, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useMemo } from 'react';
-import { Target } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/firebase';
 
 const CHALLENGES = [
   { text: 'Ahorra el dinero de 2 "antojos" esta semana y regístralo.', comment: 'Reto: 2 antojos' },
@@ -29,6 +30,30 @@ export default function Home() {
   const [selectedGoalId, setSelectedGoalId] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [logoError, setLogoError] = useState(false);
+  const [stats, setStats] = useState({ totalUsers: 0, totalSavings: 0, totalGoals: 0, totalBudgets: 0 });
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'public_stats', 'global'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setStats({
+          totalUsers: data.totalUsers || 0,
+          totalSavings: data.totalSavings || 0,
+          totalGoals: data.totalGoals || 0,
+          totalBudgets: data.totalBudgets || 0
+        });
+      } else {
+        // Fallback if document doesn't exist yet
+        setStats({
+          totalUsers: 0,
+          totalSavings: 0,
+          totalGoals: 0,
+          totalBudgets: 0
+        });
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Seleccionar reto y tip basados en la fecha actual para que cambien periódicamente
   const { currentChallenge, currentTip } = useMemo(() => {
@@ -217,6 +242,36 @@ export default function Home() {
             <p className="text-xs text-gray-600 leading-relaxed">
               {currentTip.text}
             </p>
+          </div>
+        </div>
+
+        {/* Impacto IAhorra */}
+        <div className="bg-certus-blue rounded-2xl p-5 shadow-sm text-white relative overflow-hidden">
+          <div className="absolute -right-4 -bottom-4 opacity-10">
+            <TrendingUp size={120} />
+          </div>
+          <div className="relative z-10">
+            <h3 className="font-display font-bold text-lg mb-4 flex items-center gap-2">
+              <span className="text-certus-cyan">⚡</span> Impacto IAhorra
+            </h3>
+            <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="flex flex-col items-center">
+                <span className="text-xl font-display font-bold text-certus-cyan">{stats.totalUsers}</span>
+                <span className="text-[9px] uppercase tracking-wider text-white/70 font-semibold mt-1">Usuarios</span>
+              </div>
+              <div className="flex flex-col items-center border-l border-white/10">
+                <span className="text-xl font-display font-bold text-certus-magenta">{stats.totalSavings}</span>
+                <span className="text-[9px] uppercase tracking-wider text-white/70 font-semibold mt-1">Ahorros</span>
+              </div>
+              <div className="flex flex-col items-center border-l border-white/10">
+                <span className="text-xl font-display font-bold text-certus-green">{stats.totalGoals}</span>
+                <span className="text-[9px] uppercase tracking-wider text-white/70 font-semibold mt-1">Metas</span>
+              </div>
+              <div className="flex flex-col items-center border-l border-white/10">
+                <span className="text-xl font-display font-bold text-yellow-400">{stats.totalBudgets}</span>
+                <span className="text-[9px] uppercase tracking-wider text-white/70 font-semibold mt-1">Pptos</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

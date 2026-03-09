@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { useAppContext } from '@/context/AppContext';
 import { useState } from 'react';
 import YouTube from 'react-youtube';
+import ShareAchievement from '@/components/ShareAchievement';
 
 type Course = {
   id: string;
@@ -237,12 +238,19 @@ export default function Education() {
               )}
               
               {completedCourses.includes(selectedCourse) ? (
-                <button
-                  onClick={() => setSelectedCourse(null)}
-                  className="w-full bg-certus-blue text-white font-display font-bold py-4 rounded-xl hover:bg-opacity-90 transition-all flex items-center justify-center gap-2"
-                >
-                  <CheckCircle2 size={20} /> CURSO COMPLETADO (CERRAR)
-                </button>
+                <div className="flex flex-col gap-4">
+                  <button
+                    onClick={() => setSelectedCourse(null)}
+                    className="w-full bg-certus-blue text-white font-display font-bold py-4 rounded-xl hover:bg-opacity-90 transition-all flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle2 size={20} /> CURSO COMPLETADO (CERRAR)
+                  </button>
+                  <ShareAchievement 
+                    title={COURSES.find(c => c.id === selectedCourse)?.title || ''} 
+                    subtitle="¡He completado este curso de educación financiera!" 
+                    type="course" 
+                  />
+                </div>
               ) : COURSES.find(c => c.id === selectedCourse)?.videoIds || COURSES.find(c => c.id === selectedCourse)?.videoId ? (
                 <div className="w-full bg-gray-100 text-gray-500 font-display font-bold py-4 rounded-xl flex items-center justify-center gap-2 text-sm">
                   Mira todos los videos para completar el curso

@@ -5,6 +5,7 @@ import { useAppContext } from '@/context/AppContext';
 import { signInWithGoogle, auth, db } from '@/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInAnonymously } from 'firebase/auth';
 import { setDoc, doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import Footer from '@/components/Footer';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -251,6 +252,7 @@ export default function Login() {
             Explorar sin registrarse
           </button>
         </form>
+        <Footer />
       </div>
     </div>
     </div>

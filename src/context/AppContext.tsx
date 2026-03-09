@@ -24,6 +24,12 @@ interface UserData {
   watchedVideos?: string[];
 }
 
+export interface BudgetItem {
+  id: string;
+  concept: string;
+  amount: number;
+}
+
 export interface Budget {
   id?: string;
   userId: string;
@@ -31,6 +37,10 @@ export interface Budget {
   variableIncome: number;
   fixedExpenses: number;
   variableExpenses: number;
+  fixedIncomeItems?: BudgetItem[];
+  variableIncomeItems?: BudgetItem[];
+  fixedExpensesItems?: BudgetItem[];
+  variableExpensesItems?: BudgetItem[];
   updatedAt: any;
 }
 
@@ -147,6 +157,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           userId: firebaseUser.uid,
           updatedAt: serverTimestamp()
         });
+        try {
+          await setDoc(doc(db, 'public_stats', 'global'), { totalBudgets: increment(1) }, { merge: true });
+        } catch (e) {
+          console.error("Failed to update global stats", e);
+        }
       }
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'budgets');
@@ -168,6 +183,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
+        // Increment global stats
+        try {
+          await setDoc(doc(db, 'public_stats', 'global'), { totalUsers: increment(1) }, { merge: true });
+        } catch (e) {
+          console.error("Failed to update global stats", e);
+        }
       } else {
         // Update existing user
         await updateDoc(userRef, {
@@ -196,6 +217,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       try {
         await addDoc(collection(db, 'savings'), savingData);
+        // Increment global stats
+        try {
+          await setDoc(doc(db, 'public_stats', 'global'), { totalSavings: increment(1) }, { merge: true });
+        } catch (e) {
+          console.error("Failed to update global stats", e);
+        }
       } catch (error) {
         handleFirestoreError(error, OperationType.CREATE, `savings`);
       }
@@ -249,6 +276,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+      // Increment global stats
+      try {
+        await setDoc(doc(db, 'public_stats', 'global'), { totalGoals: increment(1) }, { merge: true });
+      } catch (e) {
+        console.error("Failed to update global stats", e);
+      }
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'goals');
     }

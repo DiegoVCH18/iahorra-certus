@@ -3,6 +3,7 @@ import { Home, MessageSquare, PieChart, TrendingUp, User, PiggyBank, Calculator 
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/context/AppContext';
 import { useState } from 'react';
+import Footer from './Footer';
 
 export default function MainLayout() {
   const { isAuthReady, firebaseUser, user } = useAppContext();
@@ -55,6 +56,7 @@ export default function MainLayout() {
 
       <main className="flex-1 overflow-y-auto pb-[72px] md:pb-0 flex flex-col relative w-full">
         <Outlet />
+        <Footer />
       </main>
 
       {/* Bottom nav for mobile */}

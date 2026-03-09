@@ -10,7 +10,7 @@
 [![Gemini](https://img.shields.io/badge/Gemini-AI-4285F4?logo=google)](https://ai.google.dev)
 
 **🏆 Ganador 1er lugar — Categoría Innovación en Educación Financiera**
-**Semana Mundial del Ahorro 2024 — SBS Perú**
+**Semana Mundial del Ahorro 2025 — SBS Perú**
 
 ### 🔗 [iahorra-certus.vercel.app](https://iahorra-certus.vercel.app)
 
@@ -22,7 +22,7 @@
 
 IAhorra CERTUS es una aplicación web de **educación financiera personalizada**, impulsada por **Inteligencia Artificial Generativa (Gemini AI)**, diseñada para democratizar el acceso al conocimiento financiero en el Perú.
 
-Es una plataforma **EdFinTech** integral que combina herramientas de gestión financiera personal con contenido educativo oficial de la **SBS** y el **MINEDU**, adaptándose al perfil de cada usuario: niño, joven, adulto o emprendedor.
+Es una plataforma **EdFinTech** integral que combina herramientas de gestión financiera personal con contenido educativo oficial de la **SBS** y **ASBANC**, adaptándose al perfil de cada usuario: niño, joven, adulto o emprendedor.
 
 ---
 
@@ -83,7 +83,7 @@ La app estará disponible en `http://localhost:3000`
 
 ## 🏆 Reconocimientos
 
-**Semana Mundial del Ahorro 2024 — SBS Perú**
+**Semana Mundial del Ahorro 2025 — SBS Perú**
 
 > CERTUS fue la **única institución de educación superior** nominada y premiada, compitiendo frente a entidades del sector financiero como BCP, Compartamos Financiera, Caja Municipal de Ica y Banco de la Nación.
 

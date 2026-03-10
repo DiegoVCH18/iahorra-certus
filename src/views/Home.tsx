@@ -2,7 +2,7 @@ import { useAppContext } from '@/context/AppContext';
 import { PiggyBank, MessageSquare, PieChart, BookOpen, ShieldAlert, TrendingUp, User, Lightbulb, Plus, X, Users, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, getCountFromServer, collection, query, where } from 'firebase/firestore';
 import { db } from '@/firebase';
 
 const CHALLENGES = [
@@ -30,26 +30,30 @@ export default function Home() {
   const [selectedGoalId, setSelectedGoalId] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [logoError, setLogoError] = useState(false);
-  const [stats, setStats] = useState({ totalUsers: 0, totalSavings: 0, totalGoals: 0, totalBudgets: 0 });
+  const [stats, setStats] = useState({ totalUsers: 0, totalSavings: 0, totalGoals: 0, totalBudgets: 0, totalChats: 0 });
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'public_stats', 'global'), (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setStats({
+        setStats(prev => ({
+          ...prev,
           totalUsers: data.totalUsers || 0,
           totalSavings: data.totalSavings || 0,
           totalGoals: data.totalGoals || 0,
-          totalBudgets: data.totalBudgets || 0
-        });
+          totalBudgets: data.totalBudgets || 0,
+          totalChats: data.totalChats || 0
+        }));
       } else {
         // Fallback if document doesn't exist yet
-        setStats({
+        setStats(prev => ({
+          ...prev,
           totalUsers: 0,
           totalSavings: 0,
           totalGoals: 0,
-          totalBudgets: 0
-        });
+          totalBudgets: 0,
+          totalChats: 0
+        }));
       }
     });
     return () => unsubscribe();
@@ -254,22 +258,26 @@ export default function Home() {
             <h3 className="font-display font-bold text-lg mb-4 flex items-center gap-2">
               <span className="text-certus-cyan">⚡</span> Impacto IAhorra
             </h3>
-            <div className="grid grid-cols-4 gap-2 text-center">
+            <div className="grid grid-cols-5 gap-1 text-center">
               <div className="flex flex-col items-center">
-                <span className="text-xl font-display font-bold text-certus-cyan">{stats.totalUsers}</span>
-                <span className="text-[9px] uppercase tracking-wider text-white/70 font-semibold mt-1">Usuarios</span>
+                <span className="text-lg font-display font-bold text-certus-cyan">{stats.totalUsers}</span>
+                <span className="text-[8px] uppercase tracking-wider text-white/70 font-semibold mt-1">Usuarios</span>
               </div>
               <div className="flex flex-col items-center border-l border-white/10">
-                <span className="text-xl font-display font-bold text-certus-magenta">{stats.totalSavings}</span>
-                <span className="text-[9px] uppercase tracking-wider text-white/70 font-semibold mt-1">Ahorros</span>
+                <span className="text-lg font-display font-bold text-certus-magenta">{stats.totalSavings}</span>
+                <span className="text-[8px] uppercase tracking-wider text-white/70 font-semibold mt-1">Ahorros</span>
               </div>
               <div className="flex flex-col items-center border-l border-white/10">
-                <span className="text-xl font-display font-bold text-certus-green">{stats.totalGoals}</span>
-                <span className="text-[9px] uppercase tracking-wider text-white/70 font-semibold mt-1">Metas</span>
+                <span className="text-lg font-display font-bold text-certus-green">{stats.totalGoals}</span>
+                <span className="text-[8px] uppercase tracking-wider text-white/70 font-semibold mt-1">Metas</span>
               </div>
               <div className="flex flex-col items-center border-l border-white/10">
-                <span className="text-xl font-display font-bold text-yellow-400">{stats.totalBudgets}</span>
-                <span className="text-[9px] uppercase tracking-wider text-white/70 font-semibold mt-1">Pptos</span>
+                <span className="text-lg font-display font-bold text-yellow-400">{stats.totalBudgets}</span>
+                <span className="text-[8px] uppercase tracking-wider text-white/70 font-semibold mt-1">Pptos</span>
+              </div>
+              <div className="flex flex-col items-center border-l border-white/10">
+                <span className="text-lg font-display font-bold text-blue-300">{stats.totalChats}</span>
+                <span className="text-[8px] uppercase tracking-wider text-white/70 font-semibold mt-1">Chats</span>
               </div>
             </div>
           </div>

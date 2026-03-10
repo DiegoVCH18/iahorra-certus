@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, onSnapshot, setDoc, serverTimestamp, updateDoc, collection, addDoc, increment, query, where } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, serverTimestamp, updateDoc, collection, addDoc, increment, query, where, deleteDoc } from 'firebase/firestore';
 import { handleFirestoreError, OperationType } from '../lib/firestore-errors';
 
 export interface Goal {
@@ -53,6 +53,8 @@ interface AppContextType {
   updateUser: (data: Partial<UserData>) => Promise<void>;
   addSavingRecord: (amount: number, comment?: string, goalId?: string) => Promise<void>;
   addGoal: (name: string, targetAmount: number) => Promise<void>;
+  deleteGoal: (goalId: string) => Promise<void>;
+  deleteSavingRecord: (recordId: string, amount: number, goalId?: string) => Promise<void>;
   saveBudget: (budgetData: Omit<Budget, 'userId' | 'updatedAt' | 'id'>) => Promise<void>;
   markVideoWatched: (videoId: string) => Promise<void>;
 }
@@ -230,8 +232,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // 2. Update user's total savedAmount
       const userRef = doc(db, 'users', firebaseUser.uid);
       try {
+        // Use Math.max to ensure savedAmount never goes below 0, which would violate Firestore rules
+        const newSavedAmount = Math.max(0, user.savedAmount + amount);
         await updateDoc(userRef, {
-          savedAmount: increment(amount),
+          savedAmount: newSavedAmount,
           updatedAt: serverTimestamp(),
         });
       } catch (error) {
@@ -244,12 +248,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const targetGoal = goals.find(g => g.id === goalId);
         
         if (targetGoal) {
-          const newAmount = targetGoal.currentAmount + amount;
+          const newAmount = Math.max(0, targetGoal.currentAmount + amount);
           const status = newAmount >= targetGoal.targetAmount ? 'completed' : 'active';
           
           try {
             await updateDoc(goalRef, {
-              currentAmount: increment(amount),
+              currentAmount: newAmount,
               status: status,
               updatedAt: serverTimestamp(),
             });
@@ -287,6 +291,56 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const deleteGoal = async (goalId: string) => {
+    if (!firebaseUser) return;
+    try {
+      await deleteDoc(doc(db, 'goals', goalId));
+      try {
+        await setDoc(doc(db, 'public_stats', 'global'), { totalGoals: increment(-1) }, { merge: true });
+      } catch (e) {
+        console.error("Failed to update global stats", e);
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `goals/${goalId}`);
+    }
+  };
+
+  const deleteSavingRecord = async (recordId: string, amount: number, goalId?: string) => {
+    if (!firebaseUser || !user) return;
+    try {
+      await deleteDoc(doc(db, 'savings', recordId));
+      
+      const userRef = doc(db, 'users', firebaseUser.uid);
+      const newSavedAmount = Math.max(0, user.savedAmount - amount);
+      await updateDoc(userRef, {
+        savedAmount: newSavedAmount,
+        updatedAt: serverTimestamp(),
+      });
+
+      if (goalId) {
+        const goalRef = doc(db, 'goals', goalId);
+        const targetGoal = goals.find(g => g.id === goalId);
+        if (targetGoal) {
+          const newAmount = Math.max(0, targetGoal.currentAmount - amount);
+          const status = newAmount >= targetGoal.targetAmount ? 'completed' : 'active';
+          await updateDoc(goalRef, {
+            currentAmount: newAmount,
+            status: status,
+            updatedAt: serverTimestamp(),
+          });
+        }
+      }
+      
+      try {
+        await setDoc(doc(db, 'public_stats', 'global'), { totalSavings: increment(-1) }, { merge: true });
+      } catch (e) {
+        console.error("Failed to update global stats", e);
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `savings/${recordId}`);
+    }
+  };
+
   const markVideoWatched = async (videoId: string) => {
     if (!firebaseUser || !user) return;
     
@@ -305,7 +359,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AppContext.Provider value={{ user, firebaseUser, isAuthReady, goals, budget, updateUser, addSavingRecord, addGoal, saveBudget, markVideoWatched }}>
+    <AppContext.Provider value={{ user, firebaseUser, isAuthReady, goals, budget, updateUser, addSavingRecord, addGoal, deleteGoal, deleteSavingRecord, saveBudget, markVideoWatched }}>
       {children}
     </AppContext.Provider>
   );

@@ -106,7 +106,7 @@ service cloud.firestore {
     function isValidSaving(data) {
       return hasOnlyAllowedFields(['userId', 'amount', 'comment', 'date', 'goalId']) &&
              data.userId is string &&
-             data.amount is number && data.amount > 0 &&
+             data.amount is number && data.amount != 0 &&
              data.date is string &&
              (!('comment' in data) || data.comment is string) &&
              (!('goalId' in data) || data.goalId is string);
@@ -164,7 +164,7 @@ service cloud.firestore {
                        request.resource.data.userId == request.auth.uid &&
                        isValidSaving(request.resource.data);
       allow update: if false; // Savings are immutable
-      allow delete: if false; // Savings cannot be deleted
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
 
     match /goals/{goalId} {
@@ -177,7 +177,7 @@ service cloud.firestore {
                        request.resource.data.userId == request.auth.uid &&
                        isValidGoal(request.resource.data) &&
                        areImmutableFieldsUnchanged(['createdAt', 'userId']);
-      allow delete: if false; // Goals cannot be deleted
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
 
     match /chats/{chatId} {

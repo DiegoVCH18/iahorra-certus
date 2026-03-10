@@ -1,4 +1,4 @@
-import { TrendingUp, Plus, Calendar, Trophy, Star, X, PiggyBank, Target } from 'lucide-react';
+import { TrendingUp, Plus, Calendar, Trophy, Star, X, PiggyBank, Target, Trash2, Minus } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { cn } from '@/lib/utils';
@@ -13,12 +13,23 @@ interface SavingRecord {
   amount: number;
   date: string;
   comment: string;
+  goalId?: string;
 }
 
 export default function Progress() {
-  const { user, firebaseUser, addSavingRecord, goals, addGoal } = useAppContext();
+  const { user, firebaseUser, addSavingRecord, goals, addGoal, deleteGoal, deleteSavingRecord } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isAlert?: boolean;
+  }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+  
   const [amount, setAmount] = useState('');
   const [comment, setComment] = useState('');
   const [selectedGoalId, setSelectedGoalId] = useState<string>('');
@@ -96,6 +107,85 @@ export default function Progress() {
     }
   };
 
+  const handleWithdraw = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const numAmount = parseFloat(amount);
+    if (isNaN(numAmount) || numAmount <= 0) return;
+
+    const targetGoal = goals.find(g => g.id === selectedGoalId);
+    if (!targetGoal || numAmount > targetGoal.currentAmount) {
+      setConfirmModal({
+        isOpen: true,
+        title: 'Monto inválido',
+        message: 'El monto a retirar no puede ser mayor al saldo actual de la meta.',
+        onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false })),
+        isAlert: true
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await addSavingRecord(-numAmount, comment || 'Retiro de meta', selectedGoalId);
+      setIsWithdrawModalOpen(false);
+      setAmount('');
+      setComment('');
+      
+      // Mostrar feedback de éxito
+      setConfirmModal({
+        isOpen: true,
+        title: '¡Retiro exitoso!',
+        message: `Has retirado S/ ${numAmount.toFixed(2)} de tu meta "${targetGoal.name}".`,
+        onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false })),
+        isAlert: true
+      });
+    } catch (error: any) {
+      console.error("Failed to withdraw", error);
+      let errorMessage = 'Hubo un problema al procesar el retiro. Por favor, inténtalo de nuevo.';
+      if (error instanceof Error) {
+        try {
+          const errInfo = JSON.parse(error.message);
+          errorMessage = `Error: ${errInfo.error} (Operación: ${errInfo.operationType}, Ruta: ${errInfo.path})`;
+        } catch (e) {
+          errorMessage = error.message;
+        }
+      }
+      setConfirmModal({
+        isOpen: true,
+        title: 'Error',
+        message: errorMessage,
+        onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false })),
+        isAlert: true
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteGoal = (goalId: string, goalName: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Eliminar meta',
+      message: `¿Estás seguro de eliminar la meta "${goalName}"? Esta acción no se puede deshacer.`,
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        await deleteGoal(goalId);
+      }
+    });
+  };
+
+  const handleDeleteSavingRecord = (recordId: string, amount: number, goalId?: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Eliminar registro',
+      message: `¿Estás seguro de eliminar este registro del historial?`,
+      onConfirm: async () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+        await deleteSavingRecord(recordId, amount, goalId);
+      }
+    });
+  };
+
   // Process data for the chart (last 7 days)
   const chartData = processChartData(savings);
 
@@ -145,7 +235,16 @@ export default function Progress() {
                       <div className="relative z-10">
                         <div className="flex justify-between items-start mb-1">
                           <h2 className="text-xs text-gray-500 font-medium uppercase tracking-wider">{goal.status === 'completed' ? 'Completada' : 'Meta Activa'}</h2>
-                          {goal.status === 'completed' && <Trophy className="text-certus-yellow" size={16} />}
+                          <div className="flex items-center gap-2">
+                            {goal.status === 'completed' && <Trophy className="text-certus-yellow" size={16} />}
+                            <button 
+                              onClick={() => handleDeleteGoal(goal.id, goal.name)}
+                              className="text-gray-400 hover:text-red-500 transition-colors"
+                              title="Eliminar meta"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </div>
                         <h3 className="font-display font-bold text-certus-blue text-xl mb-4">{goal.name}</h3>
                         
@@ -159,15 +258,26 @@ export default function Progress() {
                         </div>
                         <p className="text-xs text-right text-certus-magenta font-bold">{progress}% completado</p>
 
-                        {goal.status === 'completed' && (
-                          <div className="mt-4 pt-4 border-t border-gray-100">
+                        <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-3">
+                          {goal.currentAmount > 0 && (
+                            <button
+                              onClick={() => {
+                                setSelectedGoalId(goal.id);
+                                setIsWithdrawModalOpen(true);
+                              }}
+                              className="w-full py-2 px-4 rounded-lg border border-certus-cyan text-certus-cyan font-bold text-sm hover:bg-certus-cyan/5 transition-colors flex items-center justify-center gap-2"
+                            >
+                              <Minus size={16} /> Retirar de la meta
+                            </button>
+                          )}
+                          {goal.status === 'completed' && (
                             <ShareAchievement 
                               title={goal.name} 
                               subtitle="¡He completado mi meta de ahorro!" 
                               type="goal" 
                             />
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -234,6 +344,7 @@ export default function Progress() {
                       date={new Date(record.date).toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} 
                       amount={record.amount} 
                       desc={record.comment || 'Ahorro'} 
+                      onDelete={() => handleDeleteSavingRecord(record.id, record.amount, record.goalId)}
                     />
                   ))
                 )}
@@ -366,6 +477,89 @@ export default function Progress() {
           </div>
         </div>
       )}
+
+      {/* Modal Retiro */}
+      {isWithdrawModalOpen && (
+        <div className="fixed inset-0 bg-certus-blue/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="bg-certus-blue p-4 flex justify-between items-center text-white">
+              <h3 className="font-display font-bold text-lg flex items-center gap-2">
+                <Minus className="text-certus-cyan w-5 h-5" />
+                Retirar de la Meta
+              </h3>
+              <button onClick={() => setIsWithdrawModalOpen(false)} className="text-white/70 hover:text-white transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            <form onSubmit={handleWithdraw} className="p-6 flex flex-col gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Monto a retirar (S/)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  required
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full bg-certus-light border-2 border-transparent focus:border-certus-cyan rounded-xl px-4 py-3 outline-none transition-colors font-display text-lg"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Motivo (Opcional)</label>
+                <input
+                  type="text"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="w-full bg-certus-light border-2 border-transparent focus:border-certus-cyan rounded-xl px-4 py-3 outline-none transition-colors"
+                  placeholder="Ej. Emergencia médica"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSaving || !amount}
+                className="w-full bg-certus-cyan text-white font-display font-bold py-4 rounded-xl mt-2 hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? 'Procesando...' : 'RETIRAR'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Confirmación */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 bg-certus-blue/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div className="bg-certus-blue p-4 flex justify-between items-center text-white">
+              <h3 className="font-display font-bold text-lg flex items-center gap-2">
+                {confirmModal.title}
+              </h3>
+              <button onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))} className="text-white/70 hover:text-white transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-6 flex flex-col gap-6">
+              <p className="text-gray-700 text-center">{confirmModal.message}</p>
+              <div className="flex gap-3">
+                {!confirmModal.isAlert && (
+                  <button
+                    onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                    className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                )}
+                <button
+                  onClick={confirmModal.onConfirm}
+                  className="flex-1 py-3 rounded-xl bg-certus-magenta text-white font-bold hover:bg-opacity-90 transition-colors"
+                >
+                  {confirmModal.isAlert ? 'Aceptar' : 'Confirmar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -403,19 +597,27 @@ function Badge({ icon, name, active }: { icon: string, name: string, active: boo
   );
 }
 
-function HistoryItem({ date, amount, desc }: { date: string, amount: number, desc: string }) {
+function HistoryItem({ date, amount, desc, onDelete }: { date: string, amount: number, desc: string, onDelete: () => void }) {
+  const isNegative = amount < 0;
   return (
     <div className="flex items-center justify-between border-b border-gray-50 pb-3 last:border-0 last:pb-0">
       <div className="flex items-center gap-3">
-        <div className="bg-green-50 p-2 rounded-lg text-certus-success">
-          <Plus size={16} />
+        <div className={`p-2 rounded-lg ${isNegative ? 'bg-red-50 text-red-500' : 'bg-green-50 text-certus-success'}`}>
+          {isNegative ? <Minus size={16} /> : <Plus size={16} />}
         </div>
         <div>
           <p className="text-xs font-semibold text-certus-blue">{desc}</p>
           <p className="text-[10px] text-gray-400 capitalize">{date}</p>
         </div>
       </div>
-      <span className="font-bold text-certus-success text-sm">+ S/ {amount}</span>
+      <div className="flex items-center gap-3">
+        <span className={`font-bold text-sm ${isNegative ? 'text-red-500' : 'text-certus-success'}`}>
+          {isNegative ? '-' : '+'} S/ {Math.abs(amount)}
+        </span>
+        <button onClick={onDelete} className="text-gray-400 hover:text-red-500 transition-colors">
+          <Trash2 size={16} />
+        </button>
+      </div>
     </div>
   );
 }

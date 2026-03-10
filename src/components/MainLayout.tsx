@@ -60,12 +60,13 @@ export default function MainLayout() {
       </main>
 
       {/* Bottom nav for mobile */}
-      <nav className="md:hidden absolute bottom-0 w-full bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50 h-[72px]">
-        <NavItem to="/home" icon={<Home size={24} />} label="Inicio" />
-        <NavItem to="/chat" icon={<MessageSquare size={24} />} label="Chat" />
-        <NavItem to="/simulator" icon={<PieChart size={24} />} label="Simulador" />
-        <NavItem to="/budget" icon={<Calculator size={24} />} label="Presupuesto" />
-        <NavItem to="/progress" icon={<TrendingUp size={24} />} label="Progreso" />
+      <nav className="md:hidden absolute bottom-0 w-full bg-white border-t border-gray-200 px-2 sm:px-4 py-3 flex justify-around items-center z-50 h-[72px]">
+        <NavItem to="/home" icon={<Home size={22} />} label="Inicio" />
+        <NavItem to="/chat" icon={<MessageSquare size={22} />} label="Chat" />
+        <NavItem to="/simulator" icon={<PieChart size={22} />} label="Simulador" />
+        <NavItem to="/budget" icon={<Calculator size={22} />} label="Presupuesto" />
+        <NavItem to="/progress" icon={<TrendingUp size={22} />} label="Progreso" />
+        <NavItem to="/profile" icon={<User size={22} />} label="Perfil" />
       </nav>
     </div>
   );
@@ -80,7 +81,7 @@ function NavItem({ to, icon, label, desktop }: { to: string; icon: React.ReactNo
           "transition-colors",
           desktop 
             ? "flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm" 
-            : "flex flex-col items-center gap-1 text-xs font-medium",
+            : "flex flex-col items-center gap-1 text-[10px] sm:text-xs font-medium w-14 sm:w-16",
           isActive 
             ? (desktop ? "bg-certus-light text-certus-magenta" : "text-certus-magenta") 
             : "text-gray-400 hover:text-certus-blue"
@@ -88,7 +89,7 @@ function NavItem({ to, icon, label, desktop }: { to: string; icon: React.ReactNo
       }
     >
       {icon}
-      <span>{label}</span>
+      <span className="truncate w-full text-center">{label}</span>
     </NavLink>
   );
 }

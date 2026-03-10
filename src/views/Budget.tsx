@@ -81,24 +81,28 @@ function BudgetSection({ title, description, items, onChange, suggestions: initi
         {items.map(item => (
           <div key={item.id} className="flex items-center justify-between bg-white p-2 rounded-lg border border-gray-100 shadow-sm">
             {editingId === item.id ? (
-              <div className="flex items-center gap-2 w-full">
-                <input 
-                  type="text" 
-                  value={editConcept}
-                  onChange={(e) => setEditConcept(e.target.value)}
-                  className="flex-1 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm outline-none"
-                  placeholder="Concepto"
-                  list={`suggestions-${title.replace(/\s+/g, '-')}`}
-                />
-                <input 
-                  type="number" 
-                  value={editAmount}
-                  onChange={(e) => setEditAmount(e.target.value)}
-                  className="w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm outline-none"
-                  placeholder="0.00"
-                />
-                <button onClick={saveEdit} className="text-certus-green p-1 hover:bg-green-50 rounded"><Check size={16} /></button>
-                <button onClick={() => setEditingId(null)} className="text-gray-400 p-1 hover:bg-gray-100 rounded"><X size={16} /></button>
+              <div className="flex flex-col gap-2 w-full">
+                <div className="flex gap-2 w-full">
+                  <input 
+                    type="text" 
+                    value={editConcept}
+                    onChange={(e) => setEditConcept(e.target.value)}
+                    className="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded px-2 py-2 text-sm outline-none focus:border-certus-cyan"
+                    placeholder="Concepto"
+                    list={`suggestions-${title.replace(/\s+/g, '-')}`}
+                  />
+                  <input 
+                    type="number" 
+                    value={editAmount}
+                    onChange={(e) => setEditAmount(e.target.value)}
+                    className="w-24 shrink-0 bg-gray-50 border border-gray-200 rounded px-2 py-2 text-sm outline-none focus:border-certus-cyan"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="flex items-center justify-end gap-2 w-full">
+                  <button onClick={() => setEditingId(null)} className="flex-1 flex items-center justify-center gap-1 text-gray-500 bg-gray-100 px-3 py-2 rounded-lg text-xs font-bold hover:bg-gray-200 transition-colors"><X size={14} /> CANCELAR</button>
+                  <button onClick={saveEdit} disabled={!editConcept || !editAmount} className="flex-1 flex items-center justify-center gap-1 text-white bg-certus-green px-3 py-2 rounded-lg text-xs font-bold hover:bg-opacity-90 transition-colors disabled:opacity-50"><Check size={14} /> GUARDAR</button>
+                </div>
               </div>
             ) : (
               <>
@@ -116,28 +120,32 @@ function BudgetSection({ title, description, items, onChange, suggestions: initi
         ))}
 
         {isAdding ? (
-          <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-certus-cyan shadow-sm">
-            <input 
-              type="text" 
-              value={newConcept}
-              onChange={(e) => setNewConcept(e.target.value)}
-              className="flex-1 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm outline-none focus:border-certus-cyan"
-              placeholder="Concepto"
-              list={`suggestions-${title.replace(/\s+/g, '-')}`}
-              autoFocus
-            />
-            <datalist id={`suggestions-${title.replace(/\s+/g, '-')}`}>
-              {allSuggestions.map(s => <option key={s} value={s} />)}
-            </datalist>
-            <input 
-              type="number" 
-              value={newAmount}
-              onChange={(e) => setNewAmount(e.target.value)}
-              className="w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm outline-none focus:border-certus-cyan"
-              placeholder="0.00"
-            />
-            <button onClick={handleAdd} disabled={!newConcept || !newAmount} className="text-certus-green p-1 hover:bg-green-50 rounded disabled:opacity-50"><Check size={16} /></button>
-            <button onClick={() => setIsAdding(false)} className="text-gray-400 p-1 hover:bg-gray-100 rounded"><X size={16} /></button>
+          <div className="flex flex-col gap-2 bg-white p-3 rounded-lg border border-certus-cyan shadow-sm">
+            <div className="flex gap-2 w-full">
+              <input 
+                type="text" 
+                value={newConcept}
+                onChange={(e) => setNewConcept(e.target.value)}
+                className="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded px-2 py-2 text-sm outline-none focus:border-certus-cyan"
+                placeholder="Concepto"
+                list={`suggestions-${title.replace(/\s+/g, '-')}`}
+                autoFocus
+              />
+              <datalist id={`suggestions-${title.replace(/\s+/g, '-')}`}>
+                {allSuggestions.map(s => <option key={s} value={s} />)}
+              </datalist>
+              <input 
+                type="number" 
+                value={newAmount}
+                onChange={(e) => setNewAmount(e.target.value)}
+                className="w-24 shrink-0 bg-gray-50 border border-gray-200 rounded px-2 py-2 text-sm outline-none focus:border-certus-cyan"
+                placeholder="0.00"
+              />
+            </div>
+            <div className="flex items-center justify-end gap-2 w-full">
+              <button onClick={() => setIsAdding(false)} className="flex-1 flex items-center justify-center gap-1 text-gray-500 bg-gray-100 px-3 py-2 rounded-lg text-xs font-bold hover:bg-gray-200 transition-colors"><X size={14} /> CANCELAR</button>
+              <button onClick={handleAdd} disabled={!newConcept || !newAmount} className="flex-1 flex items-center justify-center gap-1 text-white bg-certus-cyan px-3 py-2 rounded-lg text-xs font-bold hover:bg-opacity-90 transition-colors disabled:opacity-50"><Check size={14} /> AGREGAR</button>
+            </div>
           </div>
         ) : (
           <button 

@@ -4,7 +4,7 @@ import { PiggyBank } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { signInWithGoogle, auth, db } from '@/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInAnonymously } from 'firebase/auth';
-import { setDoc, doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { setDoc, doc, addDoc, collection, serverTimestamp, increment } from 'firebase/firestore';
 import Footer from '@/components/Footer';
 
 export default function Login() {
@@ -102,6 +102,16 @@ export default function Login() {
         variableExpenses: 400,
         updatedAt: serverTimestamp()
       });
+
+      // Increment global stats
+      try {
+        await setDoc(doc(db, 'public_stats', 'global'), { 
+          totalUsers: increment(1),
+          totalGoals: increment(1)
+        }, { merge: true });
+      } catch (e) {
+        console.error("Failed to update global stats", e);
+      }
 
       // AppContext will handle the rest and redirect to home
     } catch (err: any) {

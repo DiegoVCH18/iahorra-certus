@@ -1,4 +1,4 @@
-import { User as UserIcon, Settings, LogOut, ChevronRight, GraduationCap, X, Save, Bell, Key, Target } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, ChevronRight, GraduationCap, X, Save, Bell, Key, Target, Globe, ShieldCheck } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { logOut, auth } from '@/firebase';
@@ -154,6 +154,52 @@ export default function Profile() {
           </div>
         </div>
 
+        <div className="bg-gradient-to-r from-[#1a2e7a] to-certus-blue rounded-2xl p-5 shadow-md text-white relative overflow-hidden">
+          <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4">
+            <Globe size={120} />
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <Globe className="text-certus-cyan" size={24} />
+              <h2 className="font-display font-bold text-lg">Semana Mundial del Ahorro 2026</h2>
+            </div>
+            <p className="text-sm text-white/80 mb-4 leading-relaxed">
+              Descubre eventos, consejos y más sobre la importancia de ahorrar.
+            </p>
+            <a 
+              href="https://semanamundialdelahorro.pe/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-block bg-certus-cyan text-certus-blue font-display font-bold px-4 py-2 rounded-lg text-sm hover:bg-white transition-colors"
+            >
+              Visitar sitio
+            </a>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-certus-blue to-[#1a2e7a] rounded-2xl p-5 shadow-md text-white relative overflow-hidden">
+          <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4">
+            <ShieldCheck size={120} />
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <ShieldCheck className="text-certus-cyan" size={24} />
+              <h2 className="font-display font-bold text-lg">Portal SBS para Usuarios</h2>
+            </div>
+            <p className="text-sm text-white/80 mb-4 leading-relaxed">
+              Descubre los servicios, contenidos educativos, programas y materiales que la SBS ha preparado para ti.
+            </p>
+            <a 
+              href="https://www.sbs.gob.pe/usuarios/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-block bg-certus-cyan text-certus-blue font-display font-bold px-4 py-2 rounded-lg text-sm hover:bg-white transition-colors"
+            >
+              Ir al portal
+            </a>
+          </div>
+        </div>
+
         <button 
           onClick={handleLogOut}
           className="w-full bg-white border border-certus-error text-certus-error font-display font-bold py-4 rounded-xl hover:bg-red-50 transition-all flex items-center justify-center gap-2 mt-4"
@@ -163,11 +209,8 @@ export default function Profile() {
         </button>
 
         <p className="text-center text-[10px] text-gray-400 mt-4">
-          IAhorra CERTUS v1.0.0<br/>
-          Licenciado por MINEDU<br/>
-          <a href="https://www.linkedin.com/in/diego-armando-vasquez/" target="_blank" rel="noopener noreferrer" className="hover:text-certus-cyan transition-colors">
-            Desarrollado por: Diego Vasquez
-          </a>
+          IAhorra CERTUS v2.0.0<br/>
+          CERTUS Licenciado por MINEDU<br/>
         </p>
       </div>
 

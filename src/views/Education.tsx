@@ -15,6 +15,11 @@ type Course = {
   videoIds?: string[];
   videoId?: string;
   recommendedFor?: string;
+  quiz?: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+  };
 };
 
 const COURSES: Course[] = [
@@ -29,7 +34,12 @@ const COURSES: Course[] = [
       "2L9wh7SpPK0", "IFSWANzx4Hk", "GBUsRncSoc8", "eDjyhhztWNo", 
       "laAeQuTOfK0", "ylagSKyWSFQ", "Tk2zeFg7iaw", "vxCoBBhWLBs", 
       "Xn63bIp18Hg", "JDCCcoHhmTE"
-    ] 
+    ],
+    quiz: {
+      question: "¿Cuál es el primer paso recomendado para organizar tus finanzas?",
+      options: ["Pedir un préstamo", "Hacer un presupuesto", "Gastar todo el sueldo"],
+      correctAnswer: 1
+    }
   },
   { 
     id: 'c2', 
@@ -44,7 +54,12 @@ const COURSES: Course[] = [
       "gc5KPl-CqEw", // Tomando decisiones financieras con claridad
       "ly38Qo32KDw", // Descifrando los sesgos financieros
       "n6H0BhprSnY"  // Estrategias prácticas de Ahorro e Inversión
-    ] 
+    ],
+    quiz: {
+      question: "¿Qué es un 'gasto hormiga'?",
+      options: ["Un gasto grande e imprevisto", "Pequeños gastos diarios que suman mucho", "El pago del alquiler mensual"],
+      correctAnswer: 1
+    }
   },
   { 
     id: 'c3', 
@@ -60,7 +75,12 @@ const COURSES: Course[] = [
       "jCacRqJYgJI",
       "-oMZUl8JAMM",
       "T6pkPAWucUY"
-    ] 
+    ],
+    quiz: {
+      question: "¿Para qué sirve principalmente una tarjeta de crédito?",
+      options: ["Para tener dinero extra gratis", "Para financiar compras y construir historial crediticio", "Para guardar mis ahorros a largo plazo"],
+      correctAnswer: 1
+    }
   }
 ];
 
@@ -69,6 +89,9 @@ export default function Education() {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [quizError, setQuizError] = useState(false);
 
   if (!user) return null;
 
@@ -110,7 +133,11 @@ export default function Education() {
     }
 
     if (allWatched && !completedCourses.includes(course.id)) {
-      handleCompleteCourse(course.id);
+      if (course.quiz) {
+        setShowQuiz(true);
+      } else {
+        handleCompleteCourse(course.id);
+      }
     }
   };
 
@@ -150,6 +177,9 @@ export default function Education() {
               onClick={() => {
                 setSelectedCourse(course.id);
                 setActiveVideoIndex(0);
+                setShowQuiz(false);
+                setSelectedAnswer(null);
+                setQuizError(false);
               }}
             />
           );
@@ -159,8 +189,8 @@ export default function Education() {
       {/* Course Modal */}
       {selectedCourse && (
         <div className="fixed inset-0 bg-certus-blue/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
-            <div className="bg-certus-blue p-4 flex justify-between items-center text-white">
+          <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+            <div className="bg-certus-blue p-4 flex justify-between items-center text-white shrink-0">
               <h3 className="font-display font-bold text-lg flex items-center gap-2">
                 <PlayCircle className="text-certus-cyan" size={20} />
                 Lección Rápida
@@ -169,7 +199,7 @@ export default function Education() {
                 <X size={24} />
               </button>
             </div>
-            <div className="p-6 flex flex-col gap-4 text-center">
+            <div className="p-6 flex flex-col gap-4 text-center overflow-y-auto">
               {COURSES.find(c => c.id === selectedCourse)?.videoIds ? (
                 <div className="w-full aspect-video rounded-xl overflow-hidden shadow-md bg-black relative">
                   <YouTube
@@ -251,6 +281,64 @@ export default function Education() {
                     type="course" 
                   />
                 </div>
+              ) : showQuiz || (
+                  // Check if all videos are watched to show quiz if user re-opens modal
+                  (() => {
+                    const course = COURSES.find(c => c.id === selectedCourse);
+                    if (!course) return false;
+                    if (course.videoIds) return course.videoIds.every(id => watchedVideos.includes(id));
+                    if (course.videoId) return watchedVideos.includes(course.videoId);
+                    return true;
+                  })()
+                ) ? (
+                COURSES.find(c => c.id === selectedCourse)?.quiz ? (
+                  <div className="flex flex-col gap-4 text-left bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <h4 className="font-display font-bold text-certus-blue flex items-center gap-2">
+                      <BookOpen size={18} className="text-certus-cyan" />
+                      Evaluación final
+                    </h4>
+                    <p className="text-sm text-gray-700 font-medium">
+                      {COURSES.find(c => c.id === selectedCourse)?.quiz?.question}
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {COURSES.find(c => c.id === selectedCourse)?.quiz?.options.map((opt, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => { setSelectedAnswer(idx); setQuizError(false); }}
+                          className={cn(
+                            "p-3 rounded-xl border text-sm text-left transition-all",
+                            selectedAnswer === idx ? "border-certus-cyan bg-certus-cyan/10 font-medium text-certus-blue" : "border-gray-200 hover:border-certus-cyan/50 text-gray-600"
+                          )}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                    {quizError && <p className="text-xs text-certus-error font-medium">Respuesta incorrecta. Intenta de nuevo.</p>}
+                    <button
+                      onClick={() => {
+                        const course = COURSES.find(c => c.id === selectedCourse);
+                        if (selectedAnswer === course?.quiz?.correctAnswer) {
+                          handleCompleteCourse(course.id);
+                        } else {
+                          setQuizError(true);
+                        }
+                      }}
+                      disabled={selectedAnswer === null || isCompleting}
+                      className="w-full bg-certus-magenta text-white font-display font-bold py-3 rounded-xl hover:bg-opacity-90 transition-all disabled:opacity-50 mt-2"
+                    >
+                      {isCompleting ? 'Guardando...' : 'FINALIZAR CURSO'}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleCompleteCourse(selectedCourse)}
+                    disabled={isCompleting}
+                    className="w-full bg-certus-magenta text-white font-display font-bold py-4 rounded-xl hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isCompleting ? 'Guardando...' : <><CheckCircle2 size={20} /> MARCAR COMO COMPLETADO</>}
+                  </button>
+                )
               ) : COURSES.find(c => c.id === selectedCourse)?.videoIds || COURSES.find(c => c.id === selectedCourse)?.videoId ? (
                 <div className="w-full bg-gray-100 text-gray-500 font-display font-bold py-4 rounded-xl flex items-center justify-center gap-2 text-sm">
                   Mira todos los videos para completar el curso

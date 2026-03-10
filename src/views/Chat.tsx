@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { GoogleGenAI } from '@google/genai';
 import Markdown from 'react-markdown';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc, increment } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 
@@ -99,6 +99,12 @@ export default function Chat() {
         text,
         timestamp: new Date().toISOString()
       });
+      // Increment global stats for chats
+      try {
+        await setDoc(doc(db, 'public_stats', 'global'), { totalChats: increment(1) }, { merge: true });
+      } catch (e) {
+        console.error("Failed to update global stats for chats", e);
+      }
     } catch (error) {
       handleFirestoreError(error, OperationType.CREATE, 'chats');
     }

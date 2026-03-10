@@ -52,33 +52,6 @@ Arquitectura  →  Progressive Web App (PWA)
 
 ---
 
-## 🚀 Ejecutar localmente
-
-### Prerrequisitos
-- Node.js 18+
-- Una API Key de [Google AI Studio](https://aistudio.google.com)
-
-### Pasos
-
-```bash
-# 1. Clona el repositorio
-git clone https://github.com/DiegoVCH18/iahorra-certus.git
-cd iahorra-certus
-
-# 2. Instala dependencias
-npm install
-
-# 3. Configura las variables de entorno
-cp .env.example .env.local
-# Edita .env.local y agrega tu VITE_GEMINI_API_KEY
-
-# 4. Ejecuta en modo desarrollo
-npm run dev
-```
-
-La app estará disponible en `http://localhost:3000`
-
----
 
 ## 🏆 Antecedente Ganador
 

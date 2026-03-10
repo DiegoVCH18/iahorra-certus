@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🐷 IAhorra CERTUS
+# 🐷 IAhorra CERTUS 2.0
 ### Solución EdFinTech con Inteligencia Artificial Generativa
 
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-magenta.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
@@ -8,9 +8,6 @@
 [![Firebase](https://img.shields.io/badge/Firebase-Firestore-orange?logo=firebase)](https://firebase.google.com)
 [![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev)
 [![Gemini](https://img.shields.io/badge/Gemini-AI-4285F4?logo=google)](https://ai.google.dev)
-
-**🏆 Ganador 1er lugar — Categoría Innovación en Educación Financiera**
-**Semana Mundial del Ahorro 2025 — SBS Perú**
 
 ### 🔗 [iahorra-certus.vercel.app](https://iahorra-certus.vercel.app)
 
@@ -23,6 +20,8 @@
 IAhorra CERTUS es una aplicación web de **educación financiera personalizada**, impulsada por **Inteligencia Artificial Generativa (Gemini AI)**, diseñada para democratizar el acceso al conocimiento financiero en el Perú.
 
 Es una plataforma **EdFinTech** integral que combina herramientas de gestión financiera personal con contenido educativo oficial de la **SBS** y **ASBANC**, adaptándose al perfil de cada usuario: niño, joven, adulto o emprendedor.
+
+Se propone como innovación en educación financiera para la Semana Mundial del Ahorro 2026 — SBS Perú
 
 ---
 
@@ -81,7 +80,7 @@ La app estará disponible en `http://localhost:3000`
 
 ---
 
-## 🏆 Reconocimientos
+## 🏆 Antecedente Ganador
 
 **Semana Mundial del Ahorro 2025 — SBS Perú**
 

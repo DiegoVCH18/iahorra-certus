@@ -1,20 +1,10 @@
-const CACHE_NAME = 'iahorra-certus-v7';
+const CACHE_NAME = 'iahorra-certus-v8';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest-light.json',
-  '/manifest-dark.json',
   '/manifest.json',
-  '/02_Digital_App_PWA/pwa_icons/icon-192.png',
-  '/02_Digital_App_PWA/pwa_icons/icon-512.png',
-  '/02_Digital_App_PWA/pwa_icons/maskable-icon-light-192.png',
-  '/02_Digital_App_PWA/pwa_icons/maskable-icon-light-512.png',
-  '/02_Digital_App_PWA/pwa_icons/maskable-icon-dark-192.png',
-  '/02_Digital_App_PWA/pwa_icons/maskable-icon-dark-512.png',
-  '/01_Brand_Core/isotipo/iahorra-isotipo-principal-192.png',
-  '/01_Brand_Core/isotipo/iahorra-isotipo-principal-512.png',
-  '/01_Brand_Core/isotipo/iahorra-isotipo-dark-192.png',
-  '/01_Brand_Core/isotipo/iahorra-isotipo-dark-512.png',
+  '/icon-192.png',
+  '/icon-512.png',
   '/favicon.png',
 ];
 

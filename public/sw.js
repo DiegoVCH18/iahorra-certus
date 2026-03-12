@@ -1,10 +1,12 @@
-const CACHE_NAME = 'iahorra-certus-v5';
+const CACHE_NAME = 'iahorra-certus-v6';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/02_Digital_App_PWA/pwa_icons/icon-192.png',
+  '/02_Digital_App_PWA/pwa_icons/icon-512.png',
+  '/02_Digital_App_PWA/pwa_icons/maskable-icon-light-192.png',
+  '/02_Digital_App_PWA/pwa_icons/maskable-icon-light-512.png',
   '/favicon.png',
 ];
 

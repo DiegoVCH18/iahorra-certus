@@ -1,9 +1,13 @@
-const CACHE_NAME = 'iahorra-v5';
+const CACHE_NAME = 'iahorra-v6';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/02_Digital_App_PWA/favicon/favicon.ico'
+  '/02_Digital_App_PWA/favicon/favicon.ico',
+  '/02_Digital_App_PWA/pwa_icons/icon-192.png',
+  '/02_Digital_App_PWA/pwa_icons/icon-512.png',
+  '/02_Digital_App_PWA/pwa_icons/maskable-icon-light-192.png',
+  '/02_Digital_App_PWA/pwa_icons/maskable-icon-light-512.png'
 ];
 
 // Instalar el Service Worker

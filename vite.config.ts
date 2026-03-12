@@ -19,19 +19,31 @@ export default defineConfig(({mode}) => {
           theme_color: '#0D1B4B',
           background_color: '#EEF2FB',
           display: 'standalone',
-          version: '1.0.0-20260312',
+          version: '1.0.0-20260312c',
           icons: [
             {
-              src: '/icon-192.png',
+              src: '/02_Digital_App_PWA/pwa_icons/icon-192.png',
               sizes: '192x192',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
             },
             {
-              src: '/icon-512.png',
+              src: '/02_Digital_App_PWA/pwa_icons/icon-512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: '/02_Digital_App_PWA/pwa_icons/maskable-icon-light-192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'maskable'
+            },
+            {
+              src: '/02_Digital_App_PWA/pwa_icons/maskable-icon-light-512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ]
         }

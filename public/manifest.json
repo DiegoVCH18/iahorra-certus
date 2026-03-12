@@ -1,27 +1,80 @@
 {
-  "name": "IAhorra CERTUS",
+  "name": "IAhorra CERTUS 2.0",
   "short_name": "IAhorra",
-  "description": "Educación financiera personalizada con Inteligencia Artificial",
+  "description": "Solución EdFinTech con Inteligencia Artificial Generativa para educación financiera personalizada",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0D1B4B",
-  "theme_color": "#0D1B4B",
   "orientation": "portrait-primary",
+  "theme_color": "#1f2937",
+  "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/logo.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-1.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot-2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ],
   "categories": ["finance", "education"],
-  "lang": "es-PE",
-  "scope": "/"
+  "shortcuts": [
+    {
+      "name": "Chat IA",
+      "short_name": "Chat",
+      "description": "Abre el asistente financiero de IA",
+      "url": "/chat",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mis Metas",
+      "short_name": "Metas",
+      "description": "Accede a tus metas financieras",
+      "url": "/metas",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }

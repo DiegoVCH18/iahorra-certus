@@ -8,6 +8,20 @@
       ]
     },
     {
+      "source": "/manifest-light.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" },
+        { "key": "Content-Type", "value": "application/manifest+json" }
+      ]
+    },
+    {
+      "source": "/manifest-dark.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" },
+        { "key": "Content-Type", "value": "application/manifest+json" }
+      ]
+    },
+    {
       "source": "/02_Digital_App_PWA/pwa_icons/icon-192.png",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }
@@ -27,6 +41,18 @@
     },
     {
       "source": "/02_Digital_App_PWA/pwa_icons/maskable-icon-light-512.png",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/02_Digital_App_PWA/pwa_icons/maskable-icon-dark-192.png",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/02_Digital_App_PWA/pwa_icons/maskable-icon-dark-512.png",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }
       ]

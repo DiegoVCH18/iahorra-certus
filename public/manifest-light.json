@@ -1,0 +1,40 @@
+{
+  "name": "IAhorra CERTUS",
+  "short_name": "IAhorra",
+  "description": "Educación financiera personalizada con Inteligencia Artificial",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D1B4B",
+  "theme_color": "#0D1B4B",
+  "orientation": "portrait-primary",
+  "version": "1.0.0-20260312d-light",
+  "icons": [
+    {
+      "src": "/01_Brand_Core/isotipo/iahorra-isotipo-principal-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/01_Brand_Core/isotipo/iahorra-isotipo-principal-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/02_Digital_App_PWA/pwa_icons/maskable-icon-light-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/02_Digital_App_PWA/pwa_icons/maskable-icon-light-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["finance", "education"],
+  "lang": "es-PE",
+  "scope": "/"
+}

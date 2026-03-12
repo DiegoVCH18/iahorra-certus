@@ -132,7 +132,7 @@ export default function Login() {
         <div className="flex items-center gap-3 text-white mb-6">
           <div className="bg-white p-1 rounded-xl w-12 h-12 flex items-center justify-center overflow-hidden">
             <img 
-              src="/pwa-192x192.png" 
+              src="/01_Brand_Core/isotipo/iahorra-isotipo-principal.png" 
               alt="Logo" 
               className="w-full h-full object-contain"
               onError={(e) => {

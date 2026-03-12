@@ -1,0 +1,40 @@
+Inventario de archivos y uso recomendado
+
+- 01_Brand_Core/isotipo/iahorra-isotipo-dark.pdf — Uso: iconos, favicon, avatar, loaders, PWA.
+- 01_Brand_Core/isotipo/iahorra-isotipo-dark.png — Uso: iconos, favicon, avatar, loaders, PWA.
+- 01_Brand_Core/isotipo/iahorra-isotipo-dark.svg — Uso: iconos, favicon, avatar, loaders, PWA.
+- 01_Brand_Core/isotipo/iahorra-isotipo-principal.pdf — Uso: iconos, favicon, avatar, loaders, PWA.
+- 01_Brand_Core/isotipo/iahorra-isotipo-principal.png — Uso: iconos, favicon, avatar, loaders, PWA.
+- 01_Brand_Core/isotipo/iahorra-isotipo-principal.svg — Uso: iconos, favicon, avatar, loaders, PWA.
+- 01_Brand_Core/lockup_institucional/iahorra-lockup-dark.pdf — Uso: piezas institucionales grandes.
+- 01_Brand_Core/lockup_institucional/iahorra-lockup-dark.png — Uso: piezas institucionales grandes.
+- 01_Brand_Core/lockup_institucional/iahorra-lockup-dark.svg — Uso: piezas institucionales grandes.
+- 01_Brand_Core/lockup_institucional/iahorra-lockup-principal.pdf — Uso: piezas institucionales grandes.
+- 01_Brand_Core/lockup_institucional/iahorra-lockup-principal.png — Uso: piezas institucionales grandes.
+- 01_Brand_Core/lockup_institucional/iahorra-lockup-principal.svg — Uso: piezas institucionales grandes.
+- 01_Brand_Core/logotipo_horizontal/iahorra-horizontal-dark.pdf — Uso: cabeceras web/app, login, home.
+- 01_Brand_Core/logotipo_horizontal/iahorra-horizontal-dark.png — Uso: cabeceras web/app, login, home.
+- 01_Brand_Core/logotipo_horizontal/iahorra-horizontal-dark.svg — Uso: cabeceras web/app, login, home.
+- 01_Brand_Core/logotipo_horizontal/iahorra-horizontal-principal.pdf — Uso: cabeceras web/app, login, home.
+- 01_Brand_Core/logotipo_horizontal/iahorra-horizontal-principal.png — Uso: cabeceras web/app, login, home.
+- 01_Brand_Core/logotipo_horizontal/iahorra-horizontal-principal.svg — Uso: cabeceras web/app, login, home.
+- 02_Digital_App_PWA/apple_touch_icons/apple-touch-icon-120x120.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/apple_touch_icons/apple-touch-icon-152x152.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/apple_touch_icons/apple-touch-icon-167x167.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/apple_touch_icons/apple-touch-icon-180x180.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/favicon/favicon-24x24.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/favicon/favicon-32x32.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/favicon/favicon-48x48.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/favicon/favicon.ico — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/pwa_icons/pwa-128x128.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/pwa_icons/pwa-144x144.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/pwa_icons/pwa-152x152.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/pwa_icons/pwa-192x192.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/pwa_icons/pwa-384x384.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/pwa_icons/pwa-512x512.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/pwa_icons/pwa-72x72.png — Uso: implementación técnica en app/PWA.
+- 02_Digital_App_PWA/pwa_icons/pwa-96x96.png — Uso: implementación técnica en app/PWA.
+- 04_Documentacion/brand_quick_guide/iahorra-dark-mode-quick-guide.pdf — Uso: reglas rápidas de aplicación.
+- 04_Documentacion/brand_quick_guide/iahorra-dark-mode-quick-guide.txt — Uso: reglas rápidas de aplicación.
+- 04_Documentacion/preview_sheet/iahorra-light-dark-preview.pdf — Uso: revisión visual y QA.
+- 04_Documentacion/preview_sheet/iahorra-light-dark-preview.png — Uso: revisión visual y QA.

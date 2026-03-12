@@ -363,7 +363,7 @@ export default function Progress() {
               <h3 className="font-display font-bold text-lg flex items-center gap-2">
                 <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center overflow-hidden p-0.5">
                   <img 
-                    src="/pwa-192x192.png" 
+                    src="/01_Brand_Core/isotipo/iahorra-isotipo-principal.png" 
                     alt="IAhorra" 
                     className="w-full h-full object-contain"
                     onError={(e) => {

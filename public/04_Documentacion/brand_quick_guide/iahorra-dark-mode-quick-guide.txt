@@ -1,0 +1,36 @@
+IAhorra — guía rápida de uso light/dark
+
+Regla principal
+- Fondo claro: usar la versión principal.
+- Fondo oscuro (azul institucional o negro): usar la versión dark-contrast.
+
+Archivos recomendados
+- Isotipo:
+  - Claro: iahorra-isotipo-principal.svg / .png
+  - Oscuro: iahorra-isotipo-dark.svg / .png
+  - Uso: app icon, favicon, avatar, loader, PWA.
+
+- Horizontal:
+  - Claro: iahorra-horizontal-principal.svg / .png
+  - Oscuro: iahorra-horizontal-dark.svg / .png
+  - Uso: header web/app, login, home, nav bar.
+
+- Lockup:
+  - Claro: iahorra-lockup-principal.svg / .png
+  - Oscuro: iahorra-lockup-dark.svg / .png
+  - Uso: piezas institucionales, presentaciones, banners grandes.
+
+Criterio de contraste aplicado
+- Se mantuvo la geometría original.
+- Para dark mode, los elementos azul oscuro se llevaron a blanco.
+- El acento celeste se mantuvo donde conserva contraste suficiente.
+- No se añadieron efectos nuevos.
+
+Fondos de prueba incluidos
+- blanco
+- azul institucional
+- negro
+
+
+Actualización:
+- Lockup dark corregido: la palabra CERTUS se muestra en azul institucional dentro de una cápsula blanca para mejorar contraste sobre fondos oscuros.

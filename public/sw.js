@@ -3,8 +3,8 @@ const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/pwa-192x192.png',
-  '/pwa-512x512.png',
+  '/02_Digital_App_PWA/pwa_icons/pwa-192x192.png',
+  '/02_Digital_App_PWA/pwa_icons/pwa-512x512.png',
 ];
 
 // Instalación — guarda assets en caché

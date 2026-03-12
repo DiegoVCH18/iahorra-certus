@@ -1,0 +1,1 @@
+Ajuste aplicado: en la versión lockup dark, la palabra CERTUS se corrigió a azul institucional sobre cápsula clara para mejorar contraste en fondo oscuro.

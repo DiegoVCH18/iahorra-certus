@@ -3,7 +3,7 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/favicon.ico'
+  '/02_Digital_App_PWA/favicon/favicon.ico'
 ];
 
 // Instalar el Service Worker

@@ -33,7 +33,7 @@ export default function MainLayout() {
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1 shadow-sm border border-gray-100">
             {!logoError ? (
               <img 
-                src="/pwa-192x192.png" 
+                src="/01_Brand_Core/isotipo/iahorra-isotipo-principal.png" 
                 alt="Logo" 
                 className="w-full h-full object-contain" 
                 onError={() => setLogoError(true)}

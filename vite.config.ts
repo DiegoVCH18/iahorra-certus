@@ -22,49 +22,13 @@ export default defineConfig(({mode}) => {
           version: '1.0.0-20260312',
           icons: [
             {
-              src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png?t=20260312',
-              sizes: '72x72',
-              type: 'image/png',
-              purpose: 'any'
-            },
-            {
-              src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png?t=20260312',
-              sizes: '96x96',
-              type: 'image/png'
-            },
-            {
-              src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png?t=20260312',
-              sizes: '128x128',
-              type: 'image/png'
-            },
-            {
-              src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png?t=20260312',
-              sizes: '144x144',
-              type: 'image/png'
-            },
-            {
-              src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png?t=20260312',
-              sizes: '152x152',
-              type: 'image/png'
-            },
-            {
-              src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png?t=20260312',
+              src: '/icon-192.png',
               sizes: '192x192',
-              type: 'image/png'
-            },
-            {
-              src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png?t=20260312',
-              sizes: '384x384',
               type: 'image/png',
-              purpose: 'any'
+              purpose: 'any maskable'
             },
             {
-              src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png?t=20260312',
-              sizes: '512x512',
-              type: 'image/png'
-            },
-            {
-              src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png?t=20260312',
+              src: '/icon-512.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any maskable'

@@ -1,9 +1,11 @@
-const CACHE_NAME = 'iahorra-certus-v4';
+const CACHE_NAME = 'iahorra-certus-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/favicon.png',
 ];
 
 // Instalación — guarda assets en caché

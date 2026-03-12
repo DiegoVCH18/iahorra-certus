@@ -19,6 +19,7 @@ export default defineConfig(({mode}) => {
           theme_color: '#0D1B4B',
           background_color: '#EEF2FB',
           display: 'standalone',
+          version: '1.0.0-20260312',
           icons: [
             {
               src: '/01_Brand_Core/isotipo/iahorra-isotipo-principal.png',

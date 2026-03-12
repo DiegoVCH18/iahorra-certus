@@ -7,6 +7,7 @@
   "background_color": "#0D1B4B",
   "theme_color": "#0D1B4B",
   "orientation": "portrait-primary",
+  "version": "1.0.0-20260312",
   "icons": [
     {
       "src": "/01_Brand_Core/isotipo/iahorra-isotipo-principal.png",

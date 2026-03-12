@@ -106,7 +106,7 @@ export default function Home() {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2 text-white">
             <div className="bg-white p-1 rounded-lg w-8 h-8 flex items-center justify-center overflow-hidden">
-              <BrandIsotipo alt="Logo" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-5 h-5" />
+              <BrandIsotipo alt="Logo" mode="light" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-5 h-5" />
             </div>
             <span className="font-display font-bold text-lg">IAhorra</span>
           </div>
@@ -282,7 +282,7 @@ export default function Home() {
             <div className="bg-certus-blue p-4 flex justify-between items-center text-white">
               <h3 className="font-display font-bold text-lg flex items-center gap-2">
                 <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center overflow-hidden p-0.5">
-                  <BrandIsotipo alt="IAhorra" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-green w-4 h-4" />
+                  <BrandIsotipo alt="IAhorra" mode="light" className="w-full h-full object-contain" fallbackClassName="text-certus-green w-4 h-4" />
                 </div>
                 Registrar ahorro
               </h3>

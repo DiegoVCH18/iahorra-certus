@@ -287,7 +287,7 @@ export default function Chat() {
         <div className="w-full max-w-3xl flex items-center gap-3">
           <div className="relative">
             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden p-1">
-              <BrandIsotipo alt="IAhorra" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-6 h-6" />
+              <BrandIsotipo alt="IAhorra" mode="light" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-6 h-6" />
             </div>
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-certus-green rounded-full border-2 border-certus-blue"></div>
           </div>
@@ -305,7 +305,7 @@ export default function Chat() {
             <div key={msg.id} className={cn("flex gap-2 max-w-[85%]", msg.role === 'user' ? "self-end flex-row-reverse" : "self-start")}>
               {msg.role === 'model' && (
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden p-0.5 border border-certus-light">
-                  <BrandIsotipo alt="IAhorra" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-4 h-4" />
+                  <BrandIsotipo alt="IAhorra" mode="light" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-4 h-4" />
                 </div>
               )}
               
@@ -338,7 +338,7 @@ export default function Chat() {
           {isLoading && (
             <div className="flex gap-2 max-w-[85%] self-start">
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden p-0.5 border border-certus-light">
-                <BrandIsotipo alt="IAhorra" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-4 h-4" />
+                <BrandIsotipo alt="IAhorra" mode="light" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-4 h-4" />
               </div>
               <div className="bg-white p-4 rounded-2xl border-l-4 border-certus-cyan shadow-sm rounded-tl-sm flex items-center gap-1">
                 <div className="w-2 h-2 bg-certus-cyan rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>

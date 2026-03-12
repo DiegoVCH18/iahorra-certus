@@ -363,7 +363,7 @@ export default function Progress() {
             <div className="bg-certus-blue p-4 flex justify-between items-center text-white">
               <h3 className="font-display font-bold text-lg flex items-center gap-2">
                 <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center overflow-hidden p-0.5">
-                  <BrandIsotipo alt="IAhorra" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-green w-4 h-4" />
+                  <BrandIsotipo alt="IAhorra" mode="light" className="w-full h-full object-contain" fallbackClassName="text-certus-green w-4 h-4" />
                 </div>
                 Registrar ahorro
               </h3>

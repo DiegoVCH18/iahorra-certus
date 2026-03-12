@@ -131,7 +131,7 @@ export default function Login() {
         <div className="bg-certus-blue pt-12 pb-6 px-6 flex flex-col items-center sm:rounded-t-3xl shadow-md">
         <div className="flex items-center gap-3 text-white mb-6">
           <div className="bg-white p-1 rounded-xl w-12 h-12 flex items-center justify-center overflow-hidden">
-            <BrandIsotipo alt="Logo" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-8 h-8" />
+            <BrandIsotipo alt="Logo" mode="light" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-8 h-8" />
           </div>
           <h1 className="font-display text-2xl font-bold">IAhorra <span className="text-certus-cyan">CERTUS</span></h1>
         </div>

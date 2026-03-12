@@ -30,7 +30,7 @@ export default function MainLayout() {
       <nav className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 p-6 z-50 shrink-0">
         <div className="flex items-center gap-2 mb-10">
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1 shadow-sm border border-gray-100">
-            <BrandIsotipo alt="Logo" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-5 h-5" />
+            <BrandIsotipo alt="Logo" mode="light" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-5 h-5" />
           </div>
           <span className="font-display font-bold text-xl text-certus-blue">IAhorra</span>
         </div>

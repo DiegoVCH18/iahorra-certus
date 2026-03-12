@@ -108,7 +108,7 @@ export default function Home() {
             <div className="bg-white p-1 rounded-lg w-8 h-8 flex items-center justify-center overflow-hidden">
               {!logoError ? (
                 <img 
-                  src="/logo.png" 
+                  src="/pwa-192x192.png" 
                   alt="Logo" 
                   className="w-full h-full object-contain"
                   onError={() => setLogoError(true)}
@@ -292,7 +292,7 @@ export default function Home() {
               <h3 className="font-display font-bold text-lg flex items-center gap-2">
                 <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center overflow-hidden p-0.5">
                   <img 
-                    src="/logo.png" 
+                    src="/pwa-192x192.png" 
                     alt="IAhorra" 
                     className="w-full h-full object-contain"
                     onError={(e) => {

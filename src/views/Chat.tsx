@@ -287,7 +287,7 @@ export default function Chat() {
           <div className="relative">
             <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden p-1">
               <img 
-                src="/logo.png" 
+                src="/pwa-192x192.png" 
                 alt="IAhorra" 
                 className="w-full h-full object-contain"
                 onError={(e) => {
@@ -314,7 +314,7 @@ export default function Chat() {
               {msg.role === 'model' && (
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden p-0.5 border border-certus-light">
                   <img 
-                    src="/logo.png" 
+                    src="/pwa-192x192.png" 
                     alt="IAhorra" 
                     className="w-full h-full object-contain"
                     onError={(e) => {
@@ -356,7 +356,7 @@ export default function Chat() {
             <div className="flex gap-2 max-w-[85%] self-start">
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden p-0.5 border border-certus-light">
                 <img 
-                  src="/logo.png" 
+                  src="/pwa-192x192.png" 
                   alt="IAhorra" 
                   className="w-full h-full object-contain"
                   onError={(e) => {

@@ -1,80 +1,63 @@
 {
-  "name": "IAhorra CERTUS 2.0",
+  "name": "IAhorra CERTUS",
   "short_name": "IAhorra",
-  "description": "Solución EdFinTech con Inteligencia Artificial Generativa para educación financiera personalizada",
+  "description": "Educación financiera personalizada con Inteligencia Artificial",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
+  "background_color": "#0D1B4B",
+  "theme_color": "#0D1B4B",
   "orientation": "portrait-primary",
-  "theme_color": "#1f2937",
-  "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
+      "src": "/pwa-72x72.png",
+      "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
+      "src": "/pwa-96x96.png",
+      "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192-maskable.png",
+      "src": "/pwa-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
-      "src": "/icon-512-maskable.png",
+      "src": "/pwa-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshot-1.png",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "/screenshot-2.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
+      "purpose": "any maskable"
     }
   ],
   "categories": ["finance", "education"],
-  "shortcuts": [
-    {
-      "name": "Chat IA",
-      "short_name": "Chat",
-      "description": "Abre el asistente financiero de IA",
-      "url": "/chat",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Mis Metas",
-      "short_name": "Metas",
-      "description": "Accede a tus metas financieras",
-      "url": "/metas",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    }
-  ]
+  "lang": "es-PE",
+  "scope": "/"
 }

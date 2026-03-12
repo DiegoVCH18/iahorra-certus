@@ -1,9 +1,10 @@
 import { useAppContext } from '@/context/AppContext';
-import { PiggyBank, MessageSquare, PieChart, BookOpen, ShieldAlert, TrendingUp, User, Lightbulb, Plus, X, Users, Target } from 'lucide-react';
+import { MessageSquare, PieChart, BookOpen, ShieldAlert, TrendingUp, User, Lightbulb, Plus, X, Users, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState, useMemo, useEffect } from 'react';
 import { doc, onSnapshot, getCountFromServer, collection, query, where } from 'firebase/firestore';
 import { db } from '@/firebase';
+import BrandIsotipo from '@/components/BrandIsotipo';
 
 const CHALLENGES = [
   { text: 'Ahorra el dinero de 2 "antojos" esta semana y regístralo.', comment: 'Reto: 2 antojos' },
@@ -29,7 +30,6 @@ export default function Home() {
   const [comment, setComment] = useState('');
   const [selectedGoalId, setSelectedGoalId] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
-  const [logoError, setLogoError] = useState(false);
   const [stats, setStats] = useState({ totalUsers: 0, totalSavings: 0, totalGoals: 0, totalBudgets: 0, totalChats: 0 });
 
   useEffect(() => {
@@ -106,16 +106,7 @@ export default function Home() {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2 text-white">
             <div className="bg-white p-1 rounded-lg w-8 h-8 flex items-center justify-center overflow-hidden">
-              {!logoError ? (
-                <img 
-                  src="/01_Brand_Core/isotipo/iahorra-isotipo-principal.png" 
-                  alt="Logo" 
-                  className="w-full h-full object-contain"
-                  onError={() => setLogoError(true)}
-                />
-              ) : (
-                <PiggyBank className="text-certus-blue w-5 h-5" />
-              )}
+              <BrandIsotipo alt="Logo" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-5 h-5" />
             </div>
             <span className="font-display font-bold text-lg">IAhorra</span>
           </div>
@@ -291,16 +282,7 @@ export default function Home() {
             <div className="bg-certus-blue p-4 flex justify-between items-center text-white">
               <h3 className="font-display font-bold text-lg flex items-center gap-2">
                 <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center overflow-hidden p-0.5">
-                  <img 
-                    src="/01_Brand_Core/isotipo/iahorra-isotipo-principal.png" 
-                    alt="IAhorra" 
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                      (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                    }}
-                  />
-                  <PiggyBank className="text-certus-green w-4 h-4 hidden" />
+                  <BrandIsotipo alt="IAhorra" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-green w-4 h-4" />
                 </div>
                 Registrar ahorro
               </h3>

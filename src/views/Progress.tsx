@@ -1,4 +1,4 @@
-import { TrendingUp, Plus, Calendar, Trophy, Star, X, PiggyBank, Target, Trash2, Minus } from 'lucide-react';
+import { TrendingUp, Plus, Calendar, Trophy, Star, X, Target, Trash2, Minus } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { cn } from '@/lib/utils';
@@ -7,6 +7,7 @@ import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestor
 import { db } from '@/firebase';
 import { handleFirestoreError, OperationType } from '@/lib/firestore-errors';
 import ShareAchievement from '@/components/ShareAchievement';
+import BrandIsotipo from '@/components/BrandIsotipo';
 
 interface SavingRecord {
   id: string;
@@ -362,16 +363,7 @@ export default function Progress() {
             <div className="bg-certus-blue p-4 flex justify-between items-center text-white">
               <h3 className="font-display font-bold text-lg flex items-center gap-2">
                 <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center overflow-hidden p-0.5">
-                  <img 
-                    src="/01_Brand_Core/isotipo/iahorra-isotipo-principal.png" 
-                    alt="IAhorra" 
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                      (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                    }}
-                  />
-                  <PiggyBank className="text-certus-green w-4 h-4 hidden" />
+                  <BrandIsotipo alt="IAhorra" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-green w-4 h-4" />
                 </div>
                 Registrar ahorro
               </h3>

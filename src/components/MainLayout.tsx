@@ -1,13 +1,12 @@
 import { Outlet, NavLink, Navigate } from 'react-router-dom';
-import { Home, MessageSquare, PieChart, TrendingUp, User, PiggyBank, Calculator } from 'lucide-react';
+import { Home, MessageSquare, PieChart, TrendingUp, User, Calculator } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppContext } from '@/context/AppContext';
-import { useState } from 'react';
 import Footer from './Footer';
+import BrandIsotipo from './BrandIsotipo';
 
 export default function MainLayout() {
   const { isAuthReady, firebaseUser, user } = useAppContext();
-  const [logoError, setLogoError] = useState(false);
 
   if (!isAuthReady) {
     return (
@@ -31,16 +30,7 @@ export default function MainLayout() {
       <nav className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 p-6 z-50 shrink-0">
         <div className="flex items-center gap-2 mb-10">
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center p-1 shadow-sm border border-gray-100">
-            {!logoError ? (
-              <img 
-                src="/01_Brand_Core/isotipo/iahorra-isotipo-principal.png" 
-                alt="Logo" 
-                className="w-full h-full object-contain" 
-                onError={() => setLogoError(true)}
-              />
-            ) : (
-              <PiggyBank className="text-certus-blue w-5 h-5" />
-            )}
+            <BrandIsotipo alt="Logo" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-5 h-5" />
           </div>
           <span className="font-display font-bold text-xl text-certus-blue">IAhorra</span>
         </div>

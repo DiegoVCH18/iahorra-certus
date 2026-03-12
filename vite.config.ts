@@ -21,6 +21,12 @@ export default defineConfig(({mode}) => {
           display: 'standalone',
           icons: [
             {
+              src: '/01_Brand_Core/isotipo/iahorra-isotipo-dark.svg',
+              sizes: 'any',
+              type: 'image/svg+xml',
+              purpose: 'any'
+            },
+            {
               src: '/02_Digital_App_PWA/pwa_icons/pwa-72x72.png',
               sizes: '72x72',
               type: 'image/png'

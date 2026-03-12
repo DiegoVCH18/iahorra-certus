@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PiggyBank } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { signInWithGoogle, auth, db } from '@/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInAnonymously } from 'firebase/auth';
 import { setDoc, doc, addDoc, collection, serverTimestamp, increment } from 'firebase/firestore';
 import Footer from '@/components/Footer';
+import BrandIsotipo from '@/components/BrandIsotipo';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -131,16 +131,7 @@ export default function Login() {
         <div className="bg-certus-blue pt-12 pb-6 px-6 flex flex-col items-center sm:rounded-t-3xl shadow-md">
         <div className="flex items-center gap-3 text-white mb-6">
           <div className="bg-white p-1 rounded-xl w-12 h-12 flex items-center justify-center overflow-hidden">
-            <img 
-              src="/01_Brand_Core/isotipo/iahorra-isotipo-principal.png" 
-              alt="Logo" 
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-              }}
-            />
-            <PiggyBank className="text-certus-blue w-8 h-8 hidden" />
+            <BrandIsotipo alt="Logo" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-8 h-8" />
           </div>
           <h1 className="font-display text-2xl font-bold">IAhorra <span className="text-certus-cyan">CERTUS</span></h1>
         </div>

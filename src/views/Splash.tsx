@@ -5,6 +5,7 @@ import { PiggyBank, MessageSquare, PieChart, ShieldAlert, ArrowRight } from 'luc
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/firebase';
 import Footer from '@/components/Footer';
+import BrandIsotipo from '@/components/BrandIsotipo';
 
 const STEPS = [
   {
@@ -80,19 +81,10 @@ export default function Splash() {
         >
           <div className="bg-white p-6 rounded-3xl mb-8 w-40 h-40 flex items-center justify-center shadow-xl">
             {currentStep === 0 ? (
-              <img 
-                src="/01_Brand_Core/isotipo/iahorra-isotipo-principal.png" 
-                alt="IAhorra CERTUS Logo" 
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                }}
-              />
+              <BrandIsotipo alt="IAhorra CERTUS Logo" mode="auto" className="w-full h-full object-contain" fallbackClassName="text-certus-blue w-16 h-16" />
             ) : (
               STEPS[currentStep].icon
             )}
-            {currentStep === 0 && <PiggyBank className="text-certus-blue w-16 h-16 hidden" />}
           </div>
           
           <h1 className="font-display text-3xl font-bold mb-2">

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iahorra-v1';
+const CACHE_NAME = 'iahorra-v2';
 const urlsToCache = [
   '/',
   '/index.html',

@@ -8,13 +8,13 @@
       ]
     },
     {
-      "source": "/icon-192.png",
+      "source": "/02_Digital_App_PWA/pwa_icons/icon-192.png",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }
       ]
     },
     {
-      "source": "/icon-512.png",
+      "source": "/02_Digital_App_PWA/pwa_icons/icon-512.png",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" }
       ]

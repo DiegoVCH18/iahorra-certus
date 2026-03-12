@@ -1,11 +1,11 @@
-const CACHE_NAME = 'iahorra-v8';
+const CACHE_NAME = 'iahorra-v9';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
   '/02_Digital_App_PWA/favicon/favicon.ico',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/02_Digital_App_PWA/pwa_icons/icon-192.png',
+  '/02_Digital_App_PWA/pwa_icons/icon-512.png',
   '/favicon.png'
 ];
 

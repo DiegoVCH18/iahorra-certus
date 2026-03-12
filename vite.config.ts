@@ -19,16 +19,16 @@ export default defineConfig(({mode}) => {
           theme_color: '#0D1B4B',
           background_color: '#EEF2FB',
           display: 'standalone',
-          version: '1.0.0-20260312f',
+          version: '1.0.0-20260312g',
           icons: [
             {
-              src: '/icon-192.png',
+              src: '/02_Digital_App_PWA/pwa_icons/icon-192.png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any'
             },
             {
-              src: '/icon-512.png',
+              src: '/02_Digital_App_PWA/pwa_icons/icon-512.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any'

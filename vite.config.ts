@@ -134,12 +134,6 @@ export default defineConfig(({ mode }) => {
           cleanupOutdatedCaches: true,
           skipWaiting: true
         },
-        // ✅ Configuración del cliente
-        client: {
-          installPrompt: true,
-          // ✅ Notificar cuando hay una nueva versión
-          periodicSyncForUpdates: 24 * 60 * 60 * 1000 // Cada 24 horas
-        },
         // ✅ Archivos que se generan
         outDir: 'dist'
       })

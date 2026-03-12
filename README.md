@@ -1,7 +1,7 @@
 <div align="center">
 
-# 🐷 IAhorra CERTUS 2.0
-### Solución EdFinTech con Inteligencia Artificial Generativa
+# IAhorra CERTUS 2.0
+### Solucion EdFinTech con Inteligencia Artificial Generativa
 
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-magenta.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 [![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)](https://iahorra-certus.vercel.app)
@@ -9,88 +9,144 @@
 [![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev)
 [![Gemini](https://img.shields.io/badge/Gemini-AI-4285F4?logo=google)](https://ai.google.dev)
 
-### 🔗 [iahorra-certus.vercel.app](https://iahorra-certus.vercel.app)
+### [iahorra-certus.vercel.app](https://iahorra-certus.vercel.app)
 
 </div>
 
 ---
 
-## 📌 ¿Qué es IAhorra CERTUS?
+## Que es IAhorra CERTUS
 
-IAhorra CERTUS es una aplicación web de **educación financiera personalizada**, impulsada por **Inteligencia Artificial Generativa (Gemini AI)**, diseñada para democratizar el acceso al conocimiento financiero en el Perú.
+IAhorra CERTUS es una aplicacion web progresiva (PWA) de tipo **EdFinTech** que combina educacion financiera y herramientas practicas de gestion del dinero para estudiantes.
 
-Es una plataforma **EdFinTech** integral que combina herramientas de gestión financiera personal con contenido educativo oficial de la **SBS** y **ASBANC**, adaptándose al perfil de cada usuario: niño, joven, adulto o emprendedor.
+Su objetivo es transformar el aprendizaje financiero en acciones diarias medibles: planificar presupuesto, crear metas de ahorro, simular escenarios y hacer seguimiento del progreso con una experiencia simple, instalable y centrada en el usuario.
 
-Se propone como innovación en educación financiera para la Semana Mundial del Ahorro 2026 — SBS Perú
+Ademas, integra IA generativa (Gemini) para acompanamiento conversacional y orientacion financiera contextual.
 
 ---
 
-## ✨ Funcionalidades
+## Impacto inicial del piloto
 
-| Módulo | Descripción |
+- 51 usuarios activos
+- 25 ahorros registrados
+- 57 metas creadas
+- 130 puntos de progreso acumulados
+
+---
+
+## Funcionalidades principales
+
+| Modulo | Descripcion |
 |--------|-------------|
-| 🤖 **Chat IA Personalizado** | Asistente financiero con IA adaptado a tu perfil etario |
-| 💰 **Simulador de Ahorro** | Proyecta tu ahorro en el tiempo de forma visual e interactiva |
-| 📊 **Presupuesto Personal** | Registra ingresos y gastos, calcula tu capacidad de ahorro |
-| 🎯 **Metas Financieras** | Crea y da seguimiento a tus metas con indicadores en tiempo real |
-| 📚 **Educación Financiera** | Cursos y contenidos oficiales SBS, MINEDU y carrera de Finanzas CERTUS |
-| 📈 **Panel de Progreso** | Historial y estadísticas personales de ahorro |
-| 👤 **Modo Invitado** | Explora sin registrarte — ideal para demos y eventos |
+| Chat IA Personalizado | Asistente financiero con IA adaptado al perfil del usuario |
+| Simulador de Ahorro | Proyeccion de ahorro en el tiempo con apoyo visual |
+| Presupuesto Personal | Registro de ingresos y gastos para calcular capacidad de ahorro |
+| Metas Financieras | Creacion y seguimiento de metas en tiempo real |
+| Panel de Progreso | Evolucion personal y logros financieros |
+| Educacion Financiera | Contenido educativo y recomendaciones accionables |
+| Modo Invitado | Exploracion sin registro para demos y adopcion rapida |
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack tecnologico
 
+```text
+Frontend      -> React 19 + TypeScript + Vite + Tailwind CSS 4
+IA Generativa -> Google Gemini AI (@google/genai)
+Backend BaaS  -> Firebase (Firestore + Authentication)
+PWA           -> Service Worker + Manifest + instalacion en movil/escritorio
+Hosting       -> Vercel (HTTPS, CDN global, despliegue continuo)
 ```
-Frontend      →  React 19 + TypeScript + Tailwind CSS 4 (Vite 6)
-IA Generativa →  Google Gemini AI (@google/genai v1.29)
-Base de datos →  Firebase Firestore (NoSQL en tiempo real)
-Auth          →  Firebase Authentication (Google + Email + Anónimo)
-Hosting       →  Vercel (CDN global, HTTPS, deploy continuo)
-Arquitectura  →  Progressive Web App (PWA)
+
+---
+
+## Arquitectura PWA
+
+- Instalacion en Android, iOS y escritorio (Chrome/Brave/Edge/Safari)
+- Soporte offline parcial con cache de recursos criticos
+- Iconografia y branding optimizados para favicon, launcher y prompt de instalacion
+- Estrategia de versionado para refresco de manifest e iconos
+
+---
+
+## Ejecucion local
+
+### 1. Clonar repositorio
+
+```bash
+git clone https://github.com/DiegoVCH18/iahorra-certus.git
+cd iahorra-certus
+```
+
+### 2. Instalar dependencias
+
+```bash
+npm install
+```
+
+### 3. Variables de entorno
+
+Crear un archivo `.env` con las credenciales requeridas (Firebase y Gemini), por ejemplo:
+
+```bash
+VITE_GEMINI_API_KEY=tu_api_key
+```
+
+### 4. Levantar entorno de desarrollo
+
+```bash
+npm run dev
+```
+
+### 5. Build de produccion
+
+```bash
+npm run build
+npm run preview
 ```
 
 ---
 
+## Despliegue
 
-## 🏆 Antecedente Ganador
+El proyecto esta desplegado en Vercel y conectado al repositorio para CI/CD automatico en cada push a `main`.
 
-**Semana Mundial del Ahorro 2025 — SBS Perú**
-
-> CERTUS fue la **única institución de educación superior** nominada y premiada, compitiendo frente a entidades del sector financiero como BCP, Compartamos Financiera, Caja Municipal de Ica y Banco de la Nación.
-
-- 🥇 **1er lugar** — Categoría: Propuesta Innovadora de Educación Financiera
-- 🎖️ Finalista — Categoría: Entidad más colaboradora
-- 🎖️ Finalista — Categoría: Mayor alcance virtual
-
-📰 [Ver nota oficial en CERTUS](https://www.certus.edu.pe/blog/certus-gana-premio-a-la-innovacion-en-educacion-financiera-con-su-asistente-virtual-iahorra/)
+- URL productiva: [iahorra-certus.vercel.app](https://iahorra-certus.vercel.app)
 
 ---
 
-## 👨‍💻 Autor
+## Antecedente institucional
 
-<div align="center">
+**Semana Mundial del Ahorro 2025 - SBS Peru**
 
-**Ing. Diego Armando Vasquez Chavez**
-CIP 337613
+- 1er lugar - Categoria: Propuesta Innovadora de Educacion Financiera
+- Finalista - Categoria: Entidad mas colaboradora
+- Finalista - Categoria: Mayor alcance virtual
 
-Docente de Tiempo Completo (PTC)
-Coordinación Académica — Carrera de Administración Financiera y Banca Digital
-**CERTUS — Escuela de Educación Superior**
-
-📧 dvasquezc@certus.edu.pe
-
-</div>
+Nota oficial:
+[Certus gana premio a la innovacion en educacion financiera con su asistente virtual IAhorra](https://www.certus.edu.pe/blog/certus-gana-premio-a-la-innovacion-en-educacion-financiera-con-su-asistente-virtual-iahorra/)
 
 ---
 
-## 📄 Licencia
+## Autor
 
-Este proyecto está bajo la licencia **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**.
+**Ing. Diego Armando Vasquez Chavez**  
+CIP 337613  
+Docente de Tiempo Completo (PTC)  
+Coordinacion Academica - Carrera de Administracion Financiera y Banca Digital  
+CERTUS - Escuela de Educacion Superior  
 
-Puedes compartir y adaptar el material siempre que se otorgue crédito al autor y no se use con fines comerciales.
+Contacto: dvasquezc@certus.edu.pe
 
-Para uso comercial o institucional, contactar a: dvasquezc@certus.edu.pe
+---
+
+## Licencia
+
+Este proyecto esta bajo la licencia **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**.
+
+Puedes compartir y adaptar el material siempre que se otorgue credito al autor y no se use con fines comerciales.
+
+Para uso comercial o institucional: dvasquezc@certus.edu.pe
 
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-magenta.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 
@@ -98,7 +154,7 @@ Para uso comercial o institucional, contactar a: dvasquezc@certus.edu.pe
 
 <div align="center">
 
-Desarrollado con ❤️ para la educación financiera del Perú 🇵🇪
+Desarrollado para fortalecer la educacion financiera en Peru
 
 **[iahorra-certus.vercel.app](https://iahorra-certus.vercel.app)**
 

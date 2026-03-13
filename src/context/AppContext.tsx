@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { auth, db } from '../firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, onSnapshot, setDoc, serverTimestamp, updateDoc, collection, addDoc, increment, query, where, deleteDoc } from 'firebase/firestore';
@@ -22,6 +22,9 @@ interface UserData {
   savedAmount: number;
   completedCourses?: string[];
   watchedVideos?: string[];
+  notificationsEnabled?: boolean;
+  lastWeeklyReminderAt?: string;
+  fraudChecklist?: string[];
 }
 
 export interface BudgetItem {
@@ -62,11 +65,13 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [user, setUser] = useState<UserData | null>(null);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [budget, setBudget] = useState<Budget | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const lastNotifiedWeekRef = useRef<string | null>(null);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -145,6 +150,61 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   }, [firebaseUser]);
 
+  useEffect(() => {
+    if (!firebaseUser || !user) return;
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    if (user.notificationsEnabled === false) return;
+    if (Notification.permission !== 'granted') return;
+
+    const now = Date.now();
+    const currentWeekKey = `${firebaseUser.uid}-${Math.floor(now / WEEK_IN_MS)}`;
+    if (lastNotifiedWeekRef.current === currentWeekKey) return;
+
+    const lastReminderMs = user.lastWeeklyReminderAt
+      ? new Date(user.lastWeeklyReminderAt).getTime()
+      : 0;
+    const shouldNotify = !lastReminderMs || now - lastReminderMs >= WEEK_IN_MS;
+    if (!shouldNotify) return;
+
+    const activeGoal = goals.find((goal) => goal.status === 'active');
+    const completedGoals = goals.filter((goal) => goal.status === 'completed').length;
+
+    let notificationTitle = 'IAhorra CERTUS';
+    let notificationBody = 'Es momento de revisar tu presupuesto y avanzar en tu meta de ahorro esta semana.';
+
+    if (activeGoal) {
+      const progress = activeGoal.targetAmount > 0
+        ? Math.min(100, Math.round((activeGoal.currentAmount / activeGoal.targetAmount) * 100))
+        : 0;
+      const remaining = Math.max(activeGoal.targetAmount - activeGoal.currentAmount, 0);
+
+      notificationTitle = `Tu meta: ${activeGoal.name}`;
+      notificationBody = `Vas ${progress}% avanzado. Esta semana te faltan S/ ${remaining.toFixed(2)} para acercarte a tu objetivo.`;
+    } else if (goals.length > 0) {
+      notificationBody = completedGoals > 0
+        ? `Llevas ${completedGoals} meta(s) completada(s). Crea una nueva meta y sigue fortaleciendo tu ahorro.`
+        : notificationBody;
+    }
+
+    try {
+      new Notification(notificationTitle, {
+        body: notificationBody,
+        icon: '/02_Digital_App_PWA/pwa_icons/icon-192.png',
+        tag: 'iahorra-weekly-reminder',
+      });
+      lastNotifiedWeekRef.current = currentWeekKey;
+
+      updateDoc(doc(db, 'users', firebaseUser.uid), {
+        lastWeeklyReminderAt: new Date().toISOString(),
+        updatedAt: serverTimestamp(),
+      }).catch((error) => {
+        handleFirestoreError(error, OperationType.UPDATE, `users/${firebaseUser.uid}`);
+      });
+    } catch (error) {
+      console.error('No se pudo mostrar la notificación semanal', error);
+    }
+  }, [firebaseUser, user, goals]);
+
   const saveBudget = async (budgetData: Omit<Budget, 'userId' | 'updatedAt' | 'id'>) => {
     if (!firebaseUser) return;
     try {
@@ -182,6 +242,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           name: data.name || firebaseUser.displayName || 'Usuario',
           ageProfile: data.ageProfile || null,
           savedAmount: data.savedAmount || 0,
+          fraudChecklist: data.fraudChecklist || [],
+          notificationsEnabled: data.notificationsEnabled ?? true,
+          lastWeeklyReminderAt: data.lastWeeklyReminderAt || null,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });

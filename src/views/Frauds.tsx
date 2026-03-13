@@ -1,19 +1,53 @@
 import { 
   ShieldAlert, AlertTriangle, CheckCircle, XCircle, MessageSquare, 
   PlayCircle, ExternalLink, PhoneCall, Smartphone, ShieldCheck, 
-  Lock, CreditCard, Monitor, ShoppingBag, EyeOff, MapPin
+  Lock, CreditCard, Monitor, ShoppingBag, EyeOff, MapPin, Star
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { useAppContext } from '@/context/AppContext';
 
 type TabType = 'tipos' | 'escenarios' | 'alertas' | 'checklist';
 type ScenarioType = 'fisico' | 'web' | 'app' | 'compras';
 
+const CHECKLIST_IDS = ['chk1', 'chk2', 'chk3', 'chk4', 'chk5', 'chk6', 'chk7', 'chk8'];
+
 export default function Frauds() {
   const navigate = useNavigate();
+  const { user, updateUser } = useAppContext();
   const [activeTab, setActiveTab] = useState<TabType>('tipos');
   const [activeScenario, setActiveScenario] = useState<ScenarioType>('fisico');
+  const [checkedItems, setCheckedItems] = useState<string[]>([]);
+
+  useEffect(() => {
+    const source = Array.isArray(user?.fraudChecklist) ? user.fraudChecklist : [];
+    const normalized = CHECKLIST_IDS.filter((id) => source.includes(id));
+    setCheckedItems(normalized);
+  }, [user?.fraudChecklist]);
+
+  const allChecked = checkedItems.length >= CHECKLIST_IDS.length;
+
+  const handleChecklistChange = async (id: string, isChecked: boolean) => {
+    const updated = isChecked
+      ? Array.from(new Set([...checkedItems, id]))
+      : checkedItems.filter(item => item !== id);
+
+    const normalized = CHECKLIST_IDS.filter((checkId) => updated.includes(checkId));
+    setCheckedItems(normalized);
+
+    if (user) {
+      try {
+        await updateUser({ fraudChecklist: normalized });
+      } catch (error) {
+        console.error('Failed to save checklist', error);
+        // Rollback local state if persistence fails.
+        const source = Array.isArray(user?.fraudChecklist) ? user.fraudChecklist : [];
+        const rollback = CHECKLIST_IDS.filter((checkId) => source.includes(checkId));
+        setCheckedItems(rollback);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col flex-1 bg-certus-light pb-20">
@@ -266,24 +300,47 @@ export default function Frauds() {
         {/* Tab Content: Checklist */}
         {activeTab === 'checklist' && (
           <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-2">
               <ShieldCheck className="text-certus-cyan" size={28} />
               <div>
                 <h2 className="font-display font-bold text-certus-blue text-lg">Tu Checklist de Seguridad</h2>
                 <p className="text-xs text-gray-500">Marca las acciones que ya realizas para protegerte.</p>
               </div>
             </div>
+
+            <div className="mb-4">
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>{checkedItems.length} de {CHECKLIST_IDS.length} acciones</span>
+                <span className="font-semibold text-certus-cyan">{Math.round((checkedItems.length / CHECKLIST_IDS.length) * 100)}%</span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2">
+                <div
+                  className="bg-certus-cyan h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.round((checkedItems.length / CHECKLIST_IDS.length) * 100)}%` }}
+                />
+              </div>
+            </div>
             
             <div className="flex flex-col gap-4">
-              <ChecklistItem id="chk1" text="Uso contraseñas seguras y diferentes para mi banco y correo." />
-              <ChecklistItem id="chk2" text="Tengo activada la verificación en dos pasos (2FA)." />
-              <ChecklistItem id="chk3" text="Reviso mis movimientos bancarios frecuentemente." />
-              <ChecklistItem id="chk4" text="Nunca comparto mis claves ni códigos OTP por teléfono." />
-              <ChecklistItem id="chk5" text="Verifico el remitente antes de abrir cualquier enlace." />
-              <ChecklistItem id="chk6" text="Cubro el teclado al digitar mi clave en cajeros o POS." />
-              <ChecklistItem id="chk7" text="Descargo apps bancarias solo de tiendas oficiales." />
-              <ChecklistItem id="chk8" text="No guardo mis contraseñas en notas del celular sin protección." />
+              <ChecklistItem id="chk1" text="Uso contraseñas seguras y diferentes para mi banco y correo." checked={checkedItems.includes('chk1')} onChange={handleChecklistChange} />
+              <ChecklistItem id="chk2" text="Tengo activada la verificación en dos pasos (2FA)." checked={checkedItems.includes('chk2')} onChange={handleChecklistChange} />
+              <ChecklistItem id="chk3" text="Reviso mis movimientos bancarios frecuentemente." checked={checkedItems.includes('chk3')} onChange={handleChecklistChange} />
+              <ChecklistItem id="chk4" text="Nunca comparto mis claves ni códigos OTP por teléfono." checked={checkedItems.includes('chk4')} onChange={handleChecklistChange} />
+              <ChecklistItem id="chk5" text="Verifico el remitente antes de abrir cualquier enlace." checked={checkedItems.includes('chk5')} onChange={handleChecklistChange} />
+              <ChecklistItem id="chk6" text="Cubro el teclado al digitar mi clave en cajeros o POS." checked={checkedItems.includes('chk6')} onChange={handleChecklistChange} />
+              <ChecklistItem id="chk7" text="Descargo apps bancarias solo de tiendas oficiales." checked={checkedItems.includes('chk7')} onChange={handleChecklistChange} />
+              <ChecklistItem id="chk8" text="No guardo mis contraseñas en notas del celular sin protección." checked={checkedItems.includes('chk8')} onChange={handleChecklistChange} />
             </div>
+
+            {allChecked && (
+              <div className="mt-6 bg-certus-cyan/10 border border-certus-cyan rounded-2xl p-4 flex items-center gap-3 animate-in fade-in zoom-in duration-300">
+                <Star className="text-certus-yellow shrink-0" size={28} fill="currentColor" />
+                <div>
+                  <p className="font-display font-bold text-certus-blue text-sm">¡Logro desbloqueado: Seguro! 🛡️</p>
+                  <p className="text-xs text-gray-600 mt-0.5">Completaste todas las acciones de seguridad. Tu logro ya aparece en Progreso.</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -412,8 +469,7 @@ function AlertBadge({ text }: { text: string }) {
   );
 }
 
-function ChecklistItem({ id, text }: { id: string, text: string }) {
-  const [checked, setChecked] = useState(false);
+function ChecklistItem({ id, text, checked, onChange }: { id: string, text: string, checked: boolean, onChange: (id: string, checked: boolean) => void }) {
   return (
     <label htmlFor={id} className={cn(
       "flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all",
@@ -425,7 +481,7 @@ function ChecklistItem({ id, text }: { id: string, text: string }) {
           id={id} 
           className="peer sr-only"
           checked={checked}
-          onChange={(e) => setChecked(e.target.checked)}
+          onChange={(e) => onChange(id, e.target.checked)}
         />
         <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:bg-certus-cyan peer-checked:border-certus-cyan transition-colors"></div>
         <CheckCircle size={14} className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />

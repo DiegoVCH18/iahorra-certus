@@ -17,6 +17,8 @@ interface SavingRecord {
   goalId?: string;
 }
 
+const SECURITY_CHECKLIST_IDS = ['chk1', 'chk2', 'chk3', 'chk4', 'chk5', 'chk6', 'chk7', 'chk8'];
+
 export default function Progress() {
   const { user, firebaseUser, addSavingRecord, goals, addGoal, deleteGoal, deleteSavingRecord } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,6 +43,8 @@ export default function Progress() {
 
   const [isSaving, setIsSaving] = useState(false);
   const [savings, setSavings] = useState<SavingRecord[]>([]);
+
+  const hasSecurityAchievement = SECURITY_CHECKLIST_IDS.every((id) => user?.fraudChecklist?.includes(id));
 
   useEffect(() => {
     if (!firebaseUser) return;
@@ -326,7 +330,7 @@ export default function Progress() {
                 <Badge icon="🔥" name="Constante" active={savings.length >= 3} />
                 <Badge icon="📚" name="Estudioso" active={user.completedCourses?.length > 0} />
                 <Badge icon="🎯" name="Meta 50%" active={goals.some(g => g.currentAmount >= g.targetAmount / 2)} />
-                <Badge icon="🛡️" name="Seguro" active={false} />
+                <Badge icon="🛡️" name="Seguro" active={hasSecurityAchievement} />
                 <Badge icon="👑" name="Meta 100%" active={goals.some(g => g.status === 'completed')} />
               </div>
             </div>

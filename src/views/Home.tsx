@@ -59,7 +59,7 @@ const CHALLENGE_TEXTS = [
 
 const CHALLENGES = CHALLENGE_TEXTS.map((text, idx) => ({
   text,
-  comment: `Reto semana ${idx + 1}: ${text}`,
+  comment: `Reto semanal: ${text}`,
 }));
 
 const TIP_TEXTS = [
@@ -96,9 +96,9 @@ const TIP_TEXTS = [
   'Revisar tu mes financiero es el inicio de un mejor mes.',
 ];
 
-const TIPS = TIP_TEXTS.map((text, idx) => ({
+const TIPS = TIP_TEXTS.map((text) => ({
   text,
-  prompt: `Ayúdame a aplicar este tip del día #${idx + 1}: "${text}". Dame 3 acciones concretas para hoy.`,
+  prompt: `Ayúdame a aplicar este tip del día: "${text}". Dame 3 acciones concretas para hoy.`,
 }));
 
 export default function Home() {

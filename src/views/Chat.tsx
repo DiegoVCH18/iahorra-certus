@@ -252,18 +252,22 @@ export default function Chat() {
   };
 
   const confirmAdvancedAssistantNavigation = async () => {
-    await trackAdvancedAssistantClick(advancedModalSource, advancedModalTriggerQuestion);
-    if (advancedModalTriggerQuestion && navigator?.clipboard?.writeText) {
-      try {
-        await navigator.clipboard.writeText(advancedModalTriggerQuestion);
-      } catch (error) {
-        console.warn('Clipboard copy failed', error);
-      }
-    }
-
     const targetUrl = buildAdvancedAssistantUrl(advancedModalTriggerQuestion);
     setIsAdvancedModalOpen(false);
-    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+
+    // iOS Safari/PWA can block popups if there is any async work before window.open.
+    // Trigger navigation first, then run async side effects.
+    const openedWindow = window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    if (!openedWindow) {
+      window.location.assign(targetUrl);
+    }
+
+    void trackAdvancedAssistantClick(advancedModalSource, advancedModalTriggerQuestion);
+    if (advancedModalTriggerQuestion && navigator?.clipboard?.writeText) {
+      void navigator.clipboard.writeText(advancedModalTriggerQuestion).catch((error) => {
+        console.warn('Clipboard copy failed', error);
+      });
+    }
   };
 
   const getNearestPreviousUserQuestion = (messageIndex: number): string => {

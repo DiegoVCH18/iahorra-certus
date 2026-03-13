@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User as UserIcon, ArrowRight, Loader2 } from 'lucide-react';
+import { Send, ArrowRight, ExternalLink, Trophy, ShieldCheck } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
-import { GoogleGenAI } from '@google/genai';
+
 import Markdown from 'react-markdown';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc, increment } from 'firebase/firestore';
@@ -25,6 +25,89 @@ const SUGGESTIONS = [
   "¿Cómo evito fraudes digitales?"
 ];
 
+const CHATGPT_GPT_URL = "https://chatgpt.com/g/g-67aba26880108191b0e99b100eeb3632-iahorra-certus-educacion-financiera-del-futuro";
+const ADVANCED_INVITE_MARKER = 'Experiencia avanzada IAhorra';
+const ENABLE_TRIGGER_TEXT_ANALYTICS = import.meta.env.VITE_ENABLE_TRIGGER_TEXT_ANALYTICS !== 'false';
+
+const COMPLEXITY_KEYWORDS = [
+  'analiza',
+  'analisis',
+  'comparar',
+  'comparacion',
+  'detalle',
+  'detallado',
+  'detallada',
+  'profundo',
+  'profunda',
+  'estrategia',
+  'estrategias',
+  'plan financiero',
+  'escenario',
+  'proyeccion',
+  'proyección',
+  'riesgo',
+  'regulacion',
+  'regulación',
+  'normativa',
+  'sbs',
+  'asbanc',
+  'sistema financiero',
+  'tcea',
+  'tea',
+  'comisiones',
+  'credito',
+  'crédito',
+  'endeudamiento'
+];
+
+function shouldSuggestAdvancedChat(prompt: string): boolean {
+  const normalizedPrompt = prompt.toLowerCase().trim();
+  if (!normalizedPrompt) return false;
+
+  const wordCount = normalizedPrompt.split(/\s+/).filter(Boolean).length;
+  const hasComplexKeyword = COMPLEXITY_KEYWORDS.some(keyword => normalizedPrompt.includes(keyword));
+  const hasComparisonIntent = /\b(vs|versus|compar(a|ar)|mejor opcion|mejor opción)\b/i.test(normalizedPrompt);
+  const hasMultiQuestionIntent = (normalizedPrompt.match(/\?/g) || []).length >= 2;
+
+  return wordCount >= 22 || hasComplexKeyword || hasComparisonIntent || hasMultiQuestionIntent;
+}
+
+function buildAdvancedInviteMessage(): string {
+  return `${ADVANCED_INVITE_MARKER}: si quieres una respuesta mas precisa y profunda sobre el sistema financiero nacional (SBS y ASBANC), puedes continuar aqui: ${CHATGPT_GPT_URL}`;
+}
+
+function isLowConfidenceResponse(response: string): boolean {
+  const normalized = response.toLowerCase().trim();
+  if (!normalized) return true;
+
+  const lowConfidenceSignals = [
+    'no cuento con suficiente contexto',
+    'no tengo suficiente contexto',
+    'no tengo suficiente informacion',
+    'no tengo suficiente información',
+    'no dispongo de suficiente informacion',
+    'no dispongo de suficiente información',
+    'no puedo confirmar',
+    'no puedo validar',
+    'podria estar incompleta',
+    'podría estar incompleta',
+    'seria mejor revisar',
+    'sería mejor revisar'
+  ];
+
+  return lowConfidenceSignals.some(signal => normalized.includes(signal));
+}
+
+function anonymizeAnalyticsQuestion(question: string): string {
+  return question
+    .replace(/\b[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, '[correo]')
+    .replace(/\b(?:\+?\d{1,3}[\s-]?)?(?:\d[\s-]?){8,12}\b/g, '[telefono]')
+    .replace(/\b\d+[\d.,]*\b/g, '[monto]')
+    .replace(/\b(dni|ruc|cuenta|tarjeta|celular|telefono|teléfono)\b\s*[:#-]?\s*[A-Za-z0-9-]+/gi, '[dato_sensible]')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export default function Chat() {
   const { user, firebaseUser, goals } = useAppContext();
   const navigate = useNavigate();
@@ -32,6 +115,12 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showAdvancedCard, setShowAdvancedCard] = useState(false);
+  const [isAdvancedModalOpen, setIsAdvancedModalOpen] = useState(false);
+  const [advancedModalSource, setAdvancedModalSource] = useState<'card' | 'message'>('card');
+  const [advancedCardCooldownRemaining, setAdvancedCardCooldownRemaining] = useState(0);
+  const [advancedTriggerQuestion, setAdvancedTriggerQuestion] = useState('');
+  const [advancedModalTriggerQuestion, setAdvancedModalTriggerQuestion] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialPromptHandledRef = useRef(false);
 
@@ -58,6 +147,8 @@ export default function Chat() {
             cta = { label: 'Ver en simulador', to: '/simulator' };
           } else if (textLower.includes('fraude') || textLower.includes('estafa')) {
             cta = { label: 'Ir a Evita Fraudes', to: '/frauds' };
+          } else if (textLower.includes('chatgpt.com/g/') || textLower.includes(ADVANCED_INVITE_MARKER.toLowerCase())) {
+            cta = { label: 'Continuar en nuestro asistente IAhorra v1.0', to: CHATGPT_GPT_URL };
           }
         }
         fetchedMessages.push({
@@ -111,55 +202,110 @@ export default function Chat() {
     }
   };
 
+  const trackAdvancedAssistantClick = async (source: 'card' | 'message', triggerQuestion: string) => {
+    if (!firebaseUser) return;
+    const normalizedQuestion = anonymizeAnalyticsQuestion(triggerQuestion).slice(0, 280);
+    const analyticsPayload: Record<string, unknown> = {
+      advancedAssistantClicks: increment(1),
+      advancedAssistantClicksFromCard: increment(source === 'card' ? 1 : 0),
+      advancedAssistantClicksFromMessage: increment(source === 'message' ? 1 : 0),
+      advancedAssistantLastTriggerSource: source,
+      advancedAssistantLastClickedAt: new Date().toISOString(),
+      advancedAssistantTriggerTextEnabled: ENABLE_TRIGGER_TEXT_ANALYTICS,
+    };
+
+    if (ENABLE_TRIGGER_TEXT_ANALYTICS) {
+      analyticsPayload.advancedAssistantLastTriggerQuestion = normalizedQuestion;
+    }
+
+    try {
+      await setDoc(
+        doc(db, 'public_stats', 'global'),
+        analyticsPayload,
+        { merge: true }
+      );
+    } catch (error) {
+      console.error('Failed to track advanced assistant click', error);
+    }
+  };
+
+  const openAdvancedAssistantModal = (source: 'card' | 'message', triggerQuestion = '') => {
+    const normalizedQuestion = triggerQuestion.trim() || advancedTriggerQuestion;
+    setAdvancedModalSource(source);
+    setAdvancedModalTriggerQuestion(normalizedQuestion);
+    setIsAdvancedModalOpen(true);
+  };
+
+  const dismissAdvancedAssistantModal = () => {
+    setIsAdvancedModalOpen(false);
+    setAdvancedCardCooldownRemaining(3);
+    setShowAdvancedCard(false);
+  };
+
+  const buildAdvancedAssistantUrl = (question: string): string => {
+    const trimmedQuestion = question.trim();
+    if (!trimmedQuestion) return CHATGPT_GPT_URL;
+
+    const url = new URL(CHATGPT_GPT_URL);
+    url.searchParams.set('prompt', trimmedQuestion);
+    return url.toString();
+  };
+
+  const confirmAdvancedAssistantNavigation = async () => {
+    await trackAdvancedAssistantClick(advancedModalSource, advancedModalTriggerQuestion);
+    if (advancedModalTriggerQuestion && navigator?.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(advancedModalTriggerQuestion);
+      } catch (error) {
+        console.warn('Clipboard copy failed', error);
+      }
+    }
+
+    const targetUrl = buildAdvancedAssistantUrl(advancedModalTriggerQuestion);
+    setIsAdvancedModalOpen(false);
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const getNearestPreviousUserQuestion = (messageIndex: number): string => {
+    for (let i = messageIndex - 1; i >= 0; i -= 1) {
+      if (messages[i]?.role === 'user') {
+        return messages[i].text;
+      }
+    }
+    return advancedTriggerQuestion;
+  };
+
   const handleSend = async (text: string) => {
     if (!text.trim() || !firebaseUser) return;
 
     // Capture history before any async operations to prevent including the new message
     const currentHistory = [...messages];
+    const userMessage = text.trim();
+    const isComplexPrompt = shouldSuggestAdvancedChat(userMessage);
+    const hasCooldown = advancedCardCooldownRemaining > 0;
+    if (hasCooldown) {
+      setAdvancedCardCooldownRemaining(prev => Math.max(prev - 1, 0));
+    }
+
+    if (isComplexPrompt) {
+      setAdvancedTriggerQuestion(userMessage);
+    }
+
+    setShowAdvancedCard(!hasCooldown && isComplexPrompt);
+    const wasRecentlyInvited = currentHistory
+      .slice(-8)
+      .some(m => m.role === 'model' && m.text.includes(ADVANCED_INVITE_MARKER));
 
     // Optimistic update for user message
     const tempId = Date.now().toString();
-    setMessages(prev => [...prev, { id: tempId, role: 'user', text }]);
+    setMessages(prev => [...prev, { id: tempId, role: 'user', text: userMessage }]);
     setInput('');
     setIsLoading(true);
 
     try {
       // Save user message to Firestore
-      await saveMessage('user', text);
+      await saveMessage('user', userMessage);
 
-      let apiKey = "";
-      try {
-        apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      } catch (e) {}
-
-      if (!apiKey || apiKey === "undefined") {
-        try {
-          apiKey = process.env.GEMINI_API_KEY;
-        } catch (e) {}
-      }
-
-      if (!apiKey || apiKey === "undefined") {
-        try {
-          apiKey = process.env.API_KEY;
-        } catch (e) {}
-      }
-      
-      if (!apiKey || apiKey === "undefined") {
-        const win = window as any;
-        if (typeof window !== 'undefined' && win.aistudio && win.aistudio.openSelectKey) {
-          await win.aistudio.openSelectKey();
-          // After selection, the key should be available in process.env.API_KEY
-          try {
-            apiKey = process.env.API_KEY;
-          } catch (e) {}
-        }
-      }
-
-      if (!apiKey || apiKey === "undefined") {
-        throw new Error("Gemini API key is missing or invalid. Please select an API key.");
-      }
-      const ai = new GoogleGenAI({ apiKey });
-      
       const systemInstruction = `
         Eres IAhorra, el asistente virtual educativo oficial de IAhorra CERTUS, una plataforma de educación financiera desarrollada por Instituto CERTUS (certus.edu.pe).
         Tu misión es enseñar finanzas personales de forma clara, cercana y sin tecnicismos.
@@ -171,12 +317,11 @@ export default function Chat() {
         Mantenlo breve, máximo 3-4 párrafos cortos.
       `;
 
-      // Filter out greeting
+      // Build chat history from previous messages
       const historyToReplay = currentHistory.filter(m => m.id !== 'greeting');
-      
-      const chatHistory: { role: string, parts: { text: string }[] }[] = [];
+      const chatHistory: { role: string; parts: { text: string }[] }[] = [];
       let lastRole = '';
-      
+
       for (const m of historyToReplay) {
         if (m.role === 'user') {
           if (lastRole === 'user') {
@@ -199,63 +344,36 @@ export default function Chat() {
         }
       }
 
-      // Ensure the history doesn't end with a user message (since we're about to send one)
+      // Ensure history doesn't end with a user turn (we're about to add one)
       if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1].role === 'user') {
         chatHistory.pop();
       }
 
-      const chat = ai.chats.create({
-        model: "gemini-3-flash-preview",
-        config: {
+      // Call the Vercel serverless function — API key stays on the server
+      const apiResponse = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage,
+          history: chatHistory.length > 0 ? chatHistory : undefined,
           systemInstruction,
-          temperature: 0.7,
-        },
-        history: chatHistory.length > 0 ? chatHistory : undefined
+        }),
       });
 
-      let responseText = '';
-      try {
-        const response = await chat.sendMessage({ message: text });
-        responseText = response.text || '';
-      } catch (error: any) {
-        if (error?.message?.includes('API_KEY_INVALID') || error?.message?.includes('API key not valid')) {
-          const win = window as any;
-          if (typeof window !== 'undefined' && win.aistudio && win.aistudio.openSelectKey) {
-            await win.aistudio.openSelectKey();
-            let newApiKey = "";
-            try {
-              newApiKey = process.env.API_KEY;
-            } catch (e) {}
-            if (!newApiKey || newApiKey === "undefined") {
-              try {
-                newApiKey = import.meta.env.VITE_GEMINI_API_KEY;
-              } catch (e) {}
-            }
-            if (newApiKey && newApiKey !== "undefined") {
-              const newAi = new GoogleGenAI({ apiKey: newApiKey });
-              const newChat = newAi.chats.create({
-                model: "gemini-3-flash-preview",
-                config: {
-                  systemInstruction,
-                  temperature: 0.7,
-                },
-                history: chatHistory.length > 0 ? chatHistory : undefined
-              });
-              const response = await newChat.sendMessage({ message: text });
-              responseText = response.text || '';
-            } else {
-              throw new Error("No se pudo obtener una nueva API key válida.");
-            }
-          } else {
-            throw error;
-          }
-        } else {
-          throw error;
-        }
+      if (!apiResponse.ok) {
+        const errData = await apiResponse.json().catch(() => ({ error: 'Error de red' }));
+        throw new Error(errData.error || 'Error del servidor');
       }
-      
+
+      const aiData = await apiResponse.json();
+      const responseText = (aiData.text as string) || '';
+
       // Save model response to Firestore
       await saveMessage('model', responseText);
+
+      if (isLowConfidenceResponse(responseText) && !wasRecentlyInvited) {
+        await saveMessage('model', buildAdvancedInviteMessage());
+      }
 
     } catch (error: any) {
       console.error("Error calling Gemini:", error);
@@ -301,7 +419,7 @@ export default function Chat() {
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-certus-light/30 items-center">
         <div className="w-full max-w-3xl flex flex-col gap-4">
-          {messages.map((msg) => (
+          {messages.map((msg, idx) => (
             <div key={msg.id} className={cn("flex gap-2 max-w-[85%]", msg.role === 'user' ? "self-end flex-row-reverse" : "self-start")}>
               {msg.role === 'model' && (
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shrink-0 mt-1 overflow-hidden p-0.5 border border-certus-light">
@@ -325,7 +443,13 @@ export default function Chat() {
                 
                 {msg.cta && (
                   <button 
-                    onClick={() => navigate(msg.cta!.to)}
+                    onClick={() => {
+                      if (msg.cta!.to.startsWith('http')) {
+                        openAdvancedAssistantModal('message', getNearestPreviousUserQuestion(idx));
+                        return;
+                      }
+                      navigate(msg.cta!.to);
+                    }}
                     className="mt-3 flex items-center gap-1 text-certus-magenta font-display font-semibold text-xs hover:underline"
                   >
                     {msg.cta.label} <ArrowRight size={14} />
@@ -389,18 +513,74 @@ export default function Chat() {
               <Send size={18} className="ml-1" />
             </button>
           </div>
-          <div className="text-center mt-3">
-            <a 
-              href="https://chatgpt.com/g/g-67aba26880108191b0e99b100eeb3632-iahorra-certus-educacion-financiera-del-futuro" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-[10px] text-gray-400 hover:text-certus-cyan underline"
-            >
-              ¿Quieres una experiencia más completa? Prueba IAhorra en ChatGPT →
-            </a>
+          {showAdvancedCard && (
+          <div className="mt-4 rounded-2xl border border-certus-cyan/30 bg-gradient-to-r from-certus-light to-white p-3 sm:p-4 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-2">
+                <p className="text-[11px] font-semibold tracking-wide text-certus-magenta uppercase">
+                  Experiencia avanzada IAhorra
+                </p>
+                <p className="text-sm text-certus-text leading-snug">
+                  Si necesitas respuestas más precisas sobre el sistema financiero peruano, usa la versión especializada de IAhorra en ChatGPT.
+                </p>
+                <div className="flex flex-wrap gap-2 text-[11px]">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-certus-blue border border-certus-light">
+                    <ShieldCheck size={12} className="text-certus-cyan" />
+                    Fuentes SBS y ASBANC
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-certus-blue border border-certus-light">
+                    <Trophy size={12} className="text-certus-yellow" />
+                    1.er lugar Semana Mundial del Ahorro 2025
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => openAdvancedAssistantModal('card', advancedTriggerQuestion)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-certus-blue px-4 py-2.5 text-sm font-display font-semibold text-white shadow-sm transition-transform hover:scale-[1.02] hover:bg-certus-magenta"
+              >
+                Probar IAhorra en ChatGPT
+                <ExternalLink size={15} />
+              </button>
+            </div>
+            <p className="mt-2 text-[11px] text-gray-500">
+              Recomendado para consultas profundas, comparación de opciones y orientación financiera paso a paso.
+            </p>
           </div>
+          )}
         </div>
       </div>
+
+      {isAdvancedModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-certus-blue/45 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl border border-certus-light">
+            <h3 className="font-display text-lg font-bold text-certus-blue">Continuar en nuestro asistente IAhorra v1.0</h3>
+            <p className="mt-2 text-sm text-certus-text leading-relaxed">
+              Vas a abrir una nueva pestaña con la versión avanzada de IAhorra en ChatGPT, especializada en consultas más precisas del sistema financiero nacional.
+            </p>
+            <p className="mt-2 text-xs text-gray-500">
+              Basado en contenidos de SBS y ASBANC, y reconocido con el 1.er lugar en la Semana Mundial del Ahorro 2025.
+            </p>
+            <p className="mt-2 text-xs text-certus-blue/80">
+              Tu última pregunta se enviará como contexto inicial y también se copiará automáticamente para que la pegues si ChatGPT no la precarga.
+            </p>
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <button
+                onClick={dismissAdvancedAssistantModal}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmAdvancedAssistantNavigation}
+                className="inline-flex items-center gap-2 rounded-lg bg-certus-blue px-3 py-2 text-sm font-semibold text-white hover:bg-certus-magenta"
+              >
+                Continuar
+                <ExternalLink size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

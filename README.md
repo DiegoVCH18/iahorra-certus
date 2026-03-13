@@ -86,17 +86,34 @@ npm install
 
 ### 3. Variables de entorno
 
-Crear un archivo `.env` con las credenciales requeridas (Firebase y Gemini), por ejemplo:
+Crear un archivo `.env` en la raíz del proyecto con las credenciales necesarias:
 
 ```bash
-VITE_GEMINI_API_KEY=tu_api_key
+# === SERVIDOR (Vercel Function — no se expone al cliente) ===
+GEMINI_API_KEY=tu_api_key_de_gemini
+
+# === CLIENTE (incluidas en el bundle del navegador) ===
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_APP_ID=...
+# Opcional: desactiva guardar texto de pregunta en analítica de Firestore
+VITE_ENABLE_TRIGGER_TEXT_ANALYTICS=false
 ```
+
+> **Seguridad**: `GEMINI_API_KEY` (sin prefijo `VITE_`) nunca se incluye en el bundle del navegador.
+> Solo existe como variable de entorno del servidor Vercel (`api/chat.ts`).
+> En Vercel Panel → Settings → Environment Variables, agrega `GEMINI_API_KEY`.
 
 ### 4. Levantar entorno de desarrollo
 
+Para desarrollo local con las Vercel Functions activas:
+
 ```bash
-npm run dev
+vercel dev
 ```
+
+Esto inicia tanto el servidor de Vite como la función serverless `/api/chat` en un único servidor local.
 
 ### 5. Build de produccion
 

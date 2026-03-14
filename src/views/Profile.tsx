@@ -207,6 +207,12 @@ export default function Profile() {
               <GraduationCap className="text-certus-cyan" size={24} />
               <h2 className="font-display font-bold text-lg">¿Quieres estudiar Administración Financiera y Banca Digital en CERTUS?</h2>
             </div>
+            <img
+              src="/01_Brand_Core/lockup_institucional/logo-white-certus-peru.png"
+              alt="Logo CERTUS Perú"
+              className="h-8 sm:h-9 w-auto mb-3"
+              loading="lazy"
+            />
             <p className="text-sm text-white/80 mb-4 leading-relaxed">
               Descubre nuestra carrera. Invierte en tu futuro hoy mismo.
             </p>

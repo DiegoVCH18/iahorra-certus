@@ -1,8 +1,71 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Calculator, Save, Plus, Trash2, Edit2, Check, X, AlertTriangle, CheckCircle2, Info } from 'lucide-react';
+import { useState, useEffect, useMemo, ChangeEvent } from 'react';
+import { Calculator, Save, Plus, Trash2, Edit2, Check, X, AlertTriangle, CheckCircle2, Info, CalendarDays } from 'lucide-react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { cn } from '@/lib/utils';
-import { useAppContext, BudgetItem } from '@/context/AppContext';
+import { useAppContext, Budget, BudgetItem } from '@/context/AppContext';
+
+interface MonthBudgetData {
+  fixedIncome: number;
+  variableIncome: number;
+  fixedExpenses: number;
+  variableExpenses: number;
+  fixedIncomeItems: BudgetItem[];
+  variableIncomeItems: BudgetItem[];
+  fixedExpensesItems: BudgetItem[];
+  variableExpensesItems: BudgetItem[];
+}
+
+const createItemId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+const cloneItemsWithNewIds = (items: BudgetItem[]) => items.map((item) => ({ ...item, id: createItemId() }));
+
+const toMonthKey = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+const getPreviousMonthKey = (monthKey: string) => {
+  const [year, month] = monthKey.split('-').map(Number);
+  const previous = new Date(year, month - 2, 1);
+  return toMonthKey(previous);
+};
+
+const formatMonthLabel = (monthKey: string) => {
+  const [year, month] = monthKey.split('-').map(Number);
+  const date = new Date(year, month - 1, 1);
+  const formatted = new Intl.DateTimeFormat('es-PE', { month: 'long', year: 'numeric' }).format(date);
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+};
+
+const createEmptyMonthBudget = (): MonthBudgetData => ({
+  fixedIncome: 0,
+  variableIncome: 0,
+  fixedExpenses: 0,
+  variableExpenses: 0,
+  fixedIncomeItems: [],
+  variableIncomeItems: [],
+  fixedExpensesItems: [],
+  variableExpensesItems: []
+});
+
+const normalizeMonthBudget = (budget: Budget): MonthBudgetData => ({
+  fixedIncome: budget.fixedIncome || 0,
+  variableIncome: budget.variableIncome || 0,
+  fixedExpenses: budget.fixedExpenses || 0,
+  variableExpenses: budget.variableExpenses || 0,
+  fixedIncomeItems: budget.fixedIncomeItems || (budget.fixedIncome ? [{ id: createItemId(), concept: 'Ingreso Fijo', amount: budget.fixedIncome }] : []),
+  variableIncomeItems: budget.variableIncomeItems || (budget.variableIncome ? [{ id: createItemId(), concept: 'Ingreso Variable', amount: budget.variableIncome }] : []),
+  fixedExpensesItems: budget.fixedExpensesItems || (budget.fixedExpenses ? [{ id: createItemId(), concept: 'Gasto Fijo', amount: budget.fixedExpenses }] : []),
+  variableExpensesItems: budget.variableExpensesItems || (budget.variableExpenses ? [{ id: createItemId(), concept: 'Gasto Variable', amount: budget.variableExpenses }] : [])
+});
+
+const isBudgetDataEmpty = (data: MonthBudgetData) => (
+  data.fixedIncomeItems.length === 0 &&
+  data.variableIncomeItems.length === 0 &&
+  data.fixedExpensesItems.length === 0 &&
+  data.variableExpensesItems.length === 0 &&
+  data.fixedIncome === 0 &&
+  data.variableIncome === 0 &&
+  data.fixedExpenses === 0 &&
+  data.variableExpenses === 0
+);
 
 interface BudgetSectionProps {
   title: string;
@@ -201,8 +264,12 @@ const SUGGESTIONS_BY_PROFILE: Record<string, { fixedIncome: string[], variableIn
 
 export default function Budget() {
   const { budget, saveBudget, user } = useAppContext();
+  const currentMonthKey = useMemo(() => toMonthKey(new Date()), []);
+  const [selectedMonthKey, setSelectedMonthKey] = useState(currentMonthKey);
   
   const [isBudgetSaved, setIsBudgetSaved] = useState(false);
+  const [copyPreviousChecked, setCopyPreviousChecked] = useState(false);
+  const [copyStatusMessage, setCopyStatusMessage] = useState<string | null>(null);
 
   // Presupuesto State
   const [fixedIncomeItems, setFixedIncomeItems] = useState<BudgetItem[]>([]);
@@ -210,14 +277,35 @@ export default function Budget() {
   const [fixedExpensesItems, setFixedExpensesItems] = useState<BudgetItem[]>([]);
   const [variableExpensesItems, setVariableExpensesItems] = useState<BudgetItem[]>([]);
 
-  useEffect(() => {
-    if (budget) {
-      setFixedIncomeItems(budget.fixedIncomeItems || (budget.fixedIncome ? [{ id: '1', concept: 'Ingreso Fijo', amount: budget.fixedIncome }] : []));
-      setVariableIncomeItems(budget.variableIncomeItems || (budget.variableIncome ? [{ id: '2', concept: 'Ingreso Variable', amount: budget.variableIncome }] : []));
-      setFixedExpensesItems(budget.fixedExpensesItems || (budget.fixedExpenses ? [{ id: '3', concept: 'Gasto Fijo', amount: budget.fixedExpenses }] : []));
-      setVariableExpensesItems(budget.variableExpensesItems || (budget.variableExpenses ? [{ id: '4', concept: 'Gasto Variable', amount: budget.variableExpenses }] : []));
+  const monthlyBudgets = useMemo<Record<string, MonthBudgetData>>(() => {
+    if (!budget) return {};
+    if (budget.monthlyBudgets && Object.keys(budget.monthlyBudgets).length > 0) {
+      return budget.monthlyBudgets;
     }
-  }, [budget]);
+
+    const legacyBudget = normalizeMonthBudget(budget);
+    if (isBudgetDataEmpty(legacyBudget)) {
+      return {};
+    }
+
+    return { [currentMonthKey]: legacyBudget };
+  }, [budget, currentMonthKey]);
+
+  const selectedMonthLabel = useMemo(() => formatMonthLabel(selectedMonthKey), [selectedMonthKey]);
+  const previousMonthKey = useMemo(() => getPreviousMonthKey(selectedMonthKey), [selectedMonthKey]);
+  const previousMonthLabel = useMemo(() => formatMonthLabel(previousMonthKey), [previousMonthKey]);
+  const previousMonthBudget = monthlyBudgets[previousMonthKey];
+  const canCopyPreviousMonth = !!previousMonthBudget && !isBudgetDataEmpty(previousMonthBudget);
+
+  useEffect(() => {
+    const monthData = monthlyBudgets[selectedMonthKey] || createEmptyMonthBudget();
+    setFixedIncomeItems(cloneItemsWithNewIds(monthData.fixedIncomeItems));
+    setVariableIncomeItems(cloneItemsWithNewIds(monthData.variableIncomeItems));
+    setFixedExpensesItems(cloneItemsWithNewIds(monthData.fixedExpensesItems));
+    setVariableExpensesItems(cloneItemsWithNewIds(monthData.variableExpensesItems));
+    setCopyPreviousChecked(false);
+    setCopyStatusMessage(null);
+  }, [monthlyBudgets, selectedMonthKey]);
 
   const suggestions = useMemo(() => {
     const profile = user?.ageProfile || 'default';
@@ -234,6 +322,7 @@ export default function Budget() {
   const totalExpenses = totalFixedExpenses + totalVariableExpenses;
   const remaining = totalIncome - totalExpenses;
   const savingPercentage = totalIncome > 0 ? (remaining / totalIncome) * 100 : 0;
+  const isCurrentMonthBlank = fixedIncomeItems.length === 0 && variableIncomeItems.length === 0 && fixedExpensesItems.length === 0 && variableExpensesItems.length === 0;
   
   const budgetData = [
     { name: 'Fijos', value: totalFixedExpenses, color: '#E05C5C' },
@@ -241,8 +330,45 @@ export default function Budget() {
     { name: 'Sobra', value: Math.max(0, remaining), color: '#3DBE7A' },
   ];
 
+  const handleMonthChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextMonth = event.target.value;
+    if (!nextMonth) return;
+    setSelectedMonthKey(nextMonth);
+    setIsBudgetSaved(false);
+  };
+
+  const handleCopyPreviousMonth = (event: ChangeEvent<HTMLInputElement>) => {
+    const shouldCopy = event.target.checked;
+    setCopyPreviousChecked(shouldCopy);
+
+    if (!shouldCopy) {
+      setCopyStatusMessage(null);
+      return;
+    }
+
+    if (!previousMonthBudget || !canCopyPreviousMonth) {
+      setCopyPreviousChecked(false);
+      setCopyStatusMessage('No hay datos del mes anterior para copiar.');
+      return;
+    }
+
+    if (!isCurrentMonthBlank) {
+      const shouldOverwrite = window.confirm('Este mes ya tiene datos en edición. ¿Deseas reemplazarlos con el presupuesto del mes anterior?');
+      if (!shouldOverwrite) {
+        setCopyPreviousChecked(false);
+        return;
+      }
+    }
+
+    setFixedIncomeItems(cloneItemsWithNewIds(previousMonthBudget.fixedIncomeItems));
+    setVariableIncomeItems(cloneItemsWithNewIds(previousMonthBudget.variableIncomeItems));
+    setFixedExpensesItems(cloneItemsWithNewIds(previousMonthBudget.fixedExpensesItems));
+    setVariableExpensesItems(cloneItemsWithNewIds(previousMonthBudget.variableExpensesItems));
+    setCopyStatusMessage(`Se copiaron los datos de ${previousMonthLabel}.`);
+  };
+
   const handleSaveBudget = async () => {
-    await saveBudget({
+    const monthPayload: MonthBudgetData = {
       fixedIncome: totalFixedIncome,
       variableIncome: totalVariableIncome,
       fixedExpenses: totalFixedExpenses,
@@ -251,7 +377,19 @@ export default function Budget() {
       variableIncomeItems,
       fixedExpensesItems,
       variableExpensesItems
+    };
+
+    const updatedMonthlyBudgets: Record<string, MonthBudgetData> = {
+      ...monthlyBudgets,
+      [selectedMonthKey]: monthPayload
+    };
+
+    await saveBudget({
+      ...monthPayload,
+      monthlyBudgets: updatedMonthlyBudgets,
+      activeMonthKey: selectedMonthKey
     });
+
     setIsBudgetSaved(true);
     setTimeout(() => setIsBudgetSaved(false), 3000);
   };
@@ -286,14 +424,68 @@ export default function Budget() {
   return (
     <div className="flex flex-col flex-1 bg-certus-light pb-6">
       <div className="bg-white px-6 py-4 shadow-sm sticky top-0 z-10">
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-2">
           <Calculator className="text-certus-cyan" />
           <h1 className="font-display text-xl font-bold text-certus-blue">Mi Presupuesto</h1>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Mes del presupuesto</p>
+            <p className="text-sm font-bold text-certus-blue">{selectedMonthLabel}</p>
+          </div>
+          <div className="flex flex-col gap-1 sm:items-end">
+            <label htmlFor="budget-month" className="text-xs text-gray-500 font-medium">Cambiar mes</label>
+            <input
+              id="budget-month"
+              type="month"
+              value={selectedMonthKey}
+              onChange={handleMonthChange}
+              aria-label="Seleccionar mes del presupuesto"
+              className="w-full sm:w-48 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-certus-blue outline-none focus:border-certus-cyan focus:ring-2 focus:ring-certus-cyan/20"
+            />
+          </div>
         </div>
       </div>
 
       <div className="p-6 flex flex-col md:flex-row gap-6">
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-4 flex-1">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+            <div className="flex items-start gap-2">
+              <CalendarDays className="text-certus-blue mt-0.5" size={18} />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-certus-blue">Control mensual activo: {selectedMonthLabel}</p>
+                <p className="text-xs text-gray-600 mt-1">
+                  {isCurrentMonthBlank
+                    ? 'Este mes inicia en blanco para que registres tu presupuesto sin arrastrar datos por error.'
+                    : 'Tienes datos en edición para este mes. Guarda para mantener el historial mensual.'}
+                </p>
+              </div>
+            </div>
+
+            <label className={cn('mt-3 flex items-start gap-2 text-sm', canCopyPreviousMonth ? 'text-gray-700' : 'text-gray-400')}>
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 accent-certus-cyan"
+                checked={copyPreviousChecked}
+                onChange={handleCopyPreviousMonth}
+                disabled={!canCopyPreviousMonth}
+                aria-label={`Copiar datos del presupuesto de ${previousMonthLabel}`}
+              />
+              <span>
+                Copiar datos del presupuesto del mes anterior ({previousMonthLabel})
+              </span>
+            </label>
+
+            {!canCopyPreviousMonth && (
+              <p className="mt-2 text-xs text-gray-500">
+                Aún no hay datos guardados en {previousMonthLabel} para copiar.
+              </p>
+            )}
+
+            {copyStatusMessage && (
+              <p className="mt-2 text-xs font-medium text-certus-blue">{copyStatusMessage}</p>
+            )}
+          </div>
           
           <BudgetSection
             title="Ingresos Fijos (S/)"

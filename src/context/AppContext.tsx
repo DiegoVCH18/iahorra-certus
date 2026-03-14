@@ -44,6 +44,17 @@ export interface Budget {
   variableIncomeItems?: BudgetItem[];
   fixedExpensesItems?: BudgetItem[];
   variableExpensesItems?: BudgetItem[];
+  monthlyBudgets?: Record<string, {
+    fixedIncome: number;
+    variableIncome: number;
+    fixedExpenses: number;
+    variableExpenses: number;
+    fixedIncomeItems: BudgetItem[];
+    variableIncomeItems: BudgetItem[];
+    fixedExpensesItems: BudgetItem[];
+    variableExpensesItems: BudgetItem[];
+  }>;
+  activeMonthKey?: string;
   updatedAt: any;
 }
 

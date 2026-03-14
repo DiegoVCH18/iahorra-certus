@@ -10,7 +10,12 @@ export default function Footer({ light }: FooterProps) {
         href="https://linktr.ee/diegovch18" 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="hover:text-certus-cyan transition-colors font-medium"
+        aria-label="Abrir perfil profesional de Ing Diego Armando Vasquez Chavez"
+        className={
+          light
+            ? 'font-medium underline underline-offset-2 text-white hover:text-certus-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-certus-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-certus-blue rounded-sm cursor-pointer transition-colors'
+            : 'font-medium underline underline-offset-2 text-blue-600 hover:text-certus-cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-certus-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-white rounded-sm cursor-pointer transition-colors'
+        }
       >
         Ing Diego Armando Vasquez Chavez CIP: 337613
       </a>

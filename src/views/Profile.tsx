@@ -1,8 +1,8 @@
-import { User as UserIcon, Settings, LogOut, ChevronRight, GraduationCap, X, Save, Bell, Key, Target, Globe, ShieldCheck } from 'lucide-react';
+import { User as UserIcon, Settings, LogOut, ChevronRight, GraduationCap, X, Save, Bell, Key, Target, Globe, ShieldCheck, MessageCircle } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { logOut, auth } from '@/firebase';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +20,12 @@ export default function Profile() {
 
   // Settings states
   const [notifications, setNotifications] = useState(true);
+  const APP_URL = 'https://iahorra-certus.vercel.app';
+  const SHARE_TEXT = 'Te comparto IAhorra CERTUS para aprender y mejorar tus finanzas:';
+
+  useEffect(() => {
+    setNotifications(user?.notificationsEnabled ?? true);
+  }, [user?.notificationsEnabled]);
 
   const handleLogOut = async () => {
     try {
@@ -66,6 +72,67 @@ export default function Profile() {
       console.error(error);
       showNotification('Error al enviar el correo ❌');
     }
+  };
+
+  const handleToggleNotifications = async () => {
+    const nextValue = !notifications;
+    setNotifications(nextValue);
+
+    if (nextValue) {
+      if (typeof window === 'undefined' || !('Notification' in window)) {
+        setNotifications(false);
+        showNotification('Tu navegador no soporta notificaciones ❌');
+        return;
+      }
+
+      let permission = Notification.permission;
+      if (permission === 'default') {
+        permission = await Notification.requestPermission();
+      }
+
+      if (permission !== 'granted') {
+        setNotifications(false);
+        showNotification('Debes permitir notificaciones para activarlas 🔔');
+        try {
+          await updateUser({ notificationsEnabled: false });
+        } catch (error) {
+          console.error(error);
+        }
+        return;
+      }
+    }
+
+    try {
+      await updateUser({ notificationsEnabled: nextValue });
+      showNotification(nextValue ? 'Notificaciones activadas 🔔' : 'Notificaciones desactivadas');
+    } catch (error) {
+      console.error(error);
+      setNotifications(!nextValue);
+      showNotification('No se pudo guardar la configuración ❌');
+    }
+  };
+
+  const handleShareApp = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: 'IAhorra CERTUS',
+          text: SHARE_TEXT,
+          url: APP_URL,
+        });
+        showNotification('Enlace listo para compartir ✅');
+        return;
+      }
+    } catch (error) {
+      // Si se cancela el share nativo, no mostramos error para evitar fricción.
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return;
+      }
+    }
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${SHARE_TEXT} ${APP_URL}`)}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    showNotification('Abriendo WhatsApp para compartir');
   };
 
   if (!user) return null;
@@ -200,6 +267,24 @@ export default function Profile() {
           </div>
         </div>
 
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-display font-bold text-certus-blue text-sm">Comparte IAhorra</p>
+              <p className="text-xs text-gray-500 mt-1">Invita a alguien a mejorar sus finanzas contigo.</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleShareApp}
+              aria-label="Compartir IAhorra por WhatsApp"
+              className="inline-flex items-center gap-2 bg-certus-green text-white font-display font-bold px-4 py-2.5 rounded-xl hover:bg-opacity-90 transition-all whitespace-nowrap"
+            >
+              <MessageCircle size={16} />
+              Compartir
+            </button>
+          </div>
+        </div>
+
         <button 
           onClick={handleLogOut}
           className="w-full bg-white border border-certus-error text-certus-error font-display font-bold py-4 rounded-xl hover:bg-red-50 transition-all flex items-center justify-center gap-2 mt-4"
@@ -288,7 +373,7 @@ export default function Profile() {
                   </div>
                 </div>
                 <button 
-                  onClick={() => setNotifications(!notifications)}
+                  onClick={handleToggleNotifications}
                   className={cn(
                     "w-12 h-6 rounded-full transition-colors relative",
                     notifications ? "bg-certus-green" : "bg-gray-300"

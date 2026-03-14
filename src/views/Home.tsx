@@ -152,13 +152,22 @@ export default function Home() {
 
   if (!user) return null;
 
+  const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+  const activeMonthKey = budget?.activeMonthKey || currentMonthKey;
+  const activeMonthBudget = budget?.monthlyBudgets?.[activeMonthKey];
+  const activeMonthLabel = new Intl.DateTimeFormat('es-PE', { month: 'long', year: 'numeric' }).format(
+    new Date(Number(activeMonthKey.split('-')[0]), Number(activeMonthKey.split('-')[1]) - 1, 1)
+  );
+
   const activeGoal = goals.find(g => g.status === 'active') || goals[0];
   const progress = activeGoal && activeGoal.targetAmount > 0 
     ? Math.min(100, Math.round((activeGoal.currentAmount / activeGoal.targetAmount) * 100)) 
     : 0;
 
-  const remainingBudget = budget 
-    ? (budget.fixedIncome + budget.variableIncome) - (budget.fixedExpenses + budget.variableExpenses)
+  const remainingBudget = budget
+    ? activeMonthBudget
+      ? (activeMonthBudget.fixedIncome + activeMonthBudget.variableIncome) - (activeMonthBudget.fixedExpenses + activeMonthBudget.variableExpenses)
+      : (budget.fixedIncome + budget.variableIncome) - (budget.fixedExpenses + budget.variableExpenses)
     : null;
 
   const handleSave = async (e: React.FormEvent) => {
@@ -253,6 +262,7 @@ export default function Home() {
                 S/ {remainingBudget} {remainingBudget > 0 ? 'sobran' : 'faltan'}
               </span>
             </div>
+            <p className="text-xs text-gray-500">Mes activo: {activeMonthLabel.charAt(0).toUpperCase() + activeMonthLabel.slice(1)}</p>
             {remainingBudget > 0 ? (
               <div 
                 className="bg-certus-light p-3 rounded-xl flex items-center gap-3 cursor-pointer hover:bg-certus-cyan/10 transition-colors"
@@ -424,14 +434,16 @@ export default function Home() {
 
 function QuickAccess({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick: () => void }) {
   return (
-    <div 
+    <button
+      type="button"
       onClick={onClick}
+      aria-label={label}
       className="bg-white rounded-2xl p-3 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-50 cursor-pointer hover:shadow-md transition-all"
     >
       <div className="bg-certus-light p-3 rounded-xl">
         {icon}
       </div>
       <span className="text-[10px] font-display font-semibold text-certus-blue text-center leading-tight">{label}</span>
-    </div>
+    </button>
   );
 }

@@ -20,6 +20,7 @@ interface UserData {
   name: string;
   ageProfile: 'niño' | 'joven' | 'adulto_joven' | 'adulto' | 'emprendedor' | null;
   savedAmount: number;
+  isDemoUser?: boolean;
   completedCourses?: string[];
   watchedVideos?: string[];
   notificationsEnabled?: boolean;
@@ -83,6 +84,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [budget, setBudget] = useState<Budget | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const lastNotifiedWeekRef = useRef<string | null>(null);
+  const isDemoSession = user?.isDemoUser === true;
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
@@ -231,13 +233,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
           updatedAt: serverTimestamp()
         });
         try {
-          await setDoc(doc(db, 'public_stats', 'global'), { totalBudgets: increment(1) }, { merge: true });
+          await setDoc(
+            doc(db, 'public_stats', 'global'),
+            isDemoSession ? { totalBudgetsDemo: increment(1) } : { totalBudgets: increment(1) },
+            { merge: true }
+          );
         } catch (e) {
           console.error("Failed to update global stats", e);
         }
       }
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, 'budgets');
+      throw error;
     }
   };
 
@@ -253,6 +260,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           name: data.name || firebaseUser.displayName || 'Usuario',
           ageProfile: data.ageProfile || null,
           savedAmount: data.savedAmount || 0,
+          isDemoUser: data.isDemoUser ?? false,
           fraudChecklist: data.fraudChecklist || [],
           notificationsEnabled: data.notificationsEnabled ?? true,
           lastWeeklyReminderAt: data.lastWeeklyReminderAt || null,
@@ -295,7 +303,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         await addDoc(collection(db, 'savings'), savingData);
         // Increment global stats
         try {
-          await setDoc(doc(db, 'public_stats', 'global'), { totalSavings: increment(1) }, { merge: true });
+          await setDoc(
+            doc(db, 'public_stats', 'global'),
+            isDemoSession ? { totalSavingsDemo: increment(1) } : { totalSavings: increment(1) },
+            { merge: true }
+          );
         } catch (e) {
           console.error("Failed to update global stats", e);
         }
@@ -356,7 +368,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       });
       // Increment global stats
       try {
-        await setDoc(doc(db, 'public_stats', 'global'), { totalGoals: increment(1) }, { merge: true });
+        await setDoc(
+          doc(db, 'public_stats', 'global'),
+          isDemoSession ? { totalGoalsDemo: increment(1) } : { totalGoals: increment(1) },
+          { merge: true }
+        );
       } catch (e) {
         console.error("Failed to update global stats", e);
       }
@@ -370,7 +386,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       await deleteDoc(doc(db, 'goals', goalId));
       try {
-        await setDoc(doc(db, 'public_stats', 'global'), { totalGoals: increment(-1) }, { merge: true });
+        await setDoc(
+          doc(db, 'public_stats', 'global'),
+          isDemoSession ? { totalGoalsDemo: increment(-1) } : { totalGoals: increment(-1) },
+          { merge: true }
+        );
       } catch (e) {
         console.error("Failed to update global stats", e);
       }
@@ -406,7 +426,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       
       try {
-        await setDoc(doc(db, 'public_stats', 'global'), { totalSavings: increment(-1) }, { merge: true });
+        await setDoc(
+          doc(db, 'public_stats', 'global'),
+          isDemoSession ? { totalSavingsDemo: increment(-1) } : { totalSavings: increment(-1) },
+          { merge: true }
+        );
       } catch (e) {
         console.error("Failed to update global stats", e);
       }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
 import { signInWithGoogle, auth, db } from '@/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInAnonymously } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInAnonymously, sendPasswordResetEmail } from 'firebase/auth';
 import { setDoc, doc, addDoc, collection, serverTimestamp, increment } from 'firebase/firestore';
 import Footer from '@/components/Footer';
 import BrandIsotipo from '@/components/BrandIsotipo';
@@ -15,6 +15,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setInfoMessage('');
     setLoading(true);
 
     try {
@@ -80,6 +82,7 @@ export default function Login() {
         name: 'Invitado',
         ageProfile: 'joven',
         savedAmount: 1500,
+        isDemoUser: true,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -106,8 +109,9 @@ export default function Login() {
       // Increment global stats
       try {
         await setDoc(doc(db, 'public_stats', 'global'), { 
-          totalUsers: increment(1),
-          totalGoals: increment(1)
+          totalUsersDemo: increment(1),
+          totalGoalsDemo: increment(1),
+          totalBudgetsDemo: increment(1)
         }, { merge: true });
       } catch (e) {
         console.error("Failed to update global stats", e);
@@ -122,6 +126,23 @@ export default function Login() {
         setError('Error al iniciar modo demo.');
       }
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setError('');
+    setInfoMessage('');
+    if (!email.trim()) {
+      setError('Ingresa tu correo para enviarte el enlace de recuperación.');
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email.trim());
+      setInfoMessage('Te enviamos un enlace para restablecer tu contraseña. Revisa tu correo.');
+    } catch (err: any) {
+      console.error(err);
+      setError('No pudimos enviar el correo de recuperación. Verifica tu correo e inténtalo de nuevo.');
     }
   };
 
@@ -140,14 +161,14 @@ export default function Login() {
           <button 
             type="button"
             className={`flex-1 py-2 text-sm font-display font-semibold rounded-md transition-colors ${!isLogin ? 'bg-white text-certus-blue' : 'text-white'}`}
-            onClick={() => { setIsLogin(false); setError(''); }}
+            onClick={() => { setIsLogin(false); setError(''); setInfoMessage(''); }}
           >
             Crear cuenta
           </button>
           <button 
             type="button"
             className={`flex-1 py-2 text-sm font-display font-semibold rounded-md transition-colors ${isLogin ? 'bg-white text-certus-blue' : 'text-white'}`}
-            onClick={() => { setIsLogin(true); setError(''); }}
+            onClick={() => { setIsLogin(true); setError(''); setInfoMessage(''); }}
           >
             Ingresar
           </button>
@@ -159,6 +180,12 @@ export default function Login() {
           {error && (
             <div className="bg-red-50 text-certus-error text-sm p-3 rounded-lg border border-red-100">
               {error}
+            </div>
+          )}
+
+          {infoMessage && (
+            <div className="bg-certus-light text-certus-blue text-sm p-3 rounded-lg border border-certus-cyan/30">
+              {infoMessage}
             </div>
           )}
 
@@ -211,7 +238,13 @@ export default function Login() {
 
           {isLogin && (
             <div className="text-right">
-              <a href="#" className="text-xs text-certus-cyan hover:underline">¿Olvidaste tu contraseña?</a>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-xs text-certus-cyan hover:underline"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
             </div>
           )}
 

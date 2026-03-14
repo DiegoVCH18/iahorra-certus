@@ -193,7 +193,11 @@ export default function Chat() {
       });
       // Increment global stats for chats
       try {
-        await setDoc(doc(db, 'public_stats', 'global'), { totalChats: increment(1) }, { merge: true });
+        await setDoc(
+          doc(db, 'public_stats', 'global'),
+          user?.isDemoUser ? { totalChatsDemo: increment(1) } : { totalChats: increment(1) },
+          { merge: true }
+        );
       } catch (e) {
         console.error("Failed to update global stats for chats", e);
       }
@@ -385,7 +389,7 @@ export default function Chat() {
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         role: 'model',
-        text: `Uy, tuve un pequeño problema técnico. Detalle: ${error?.message || 'Error desconocido'}`
+        text: 'Tuve un inconveniente para responder en este momento. Intenta nuevamente en unos segundos.'
       }]);
     } finally {
       setIsLoading(false);

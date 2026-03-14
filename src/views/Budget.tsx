@@ -268,6 +268,7 @@ export default function Budget() {
   const [selectedMonthKey, setSelectedMonthKey] = useState(currentMonthKey);
   
   const [isBudgetSaved, setIsBudgetSaved] = useState(false);
+  const [budgetSaveError, setBudgetSaveError] = useState<string | null>(null);
   const [copyPreviousChecked, setCopyPreviousChecked] = useState(false);
   const [copyStatusMessage, setCopyStatusMessage] = useState<string | null>(null);
 
@@ -384,14 +385,20 @@ export default function Budget() {
       [selectedMonthKey]: monthPayload
     };
 
-    await saveBudget({
-      ...monthPayload,
-      monthlyBudgets: updatedMonthlyBudgets,
-      activeMonthKey: selectedMonthKey
-    });
+    try {
+      await saveBudget({
+        ...monthPayload,
+        monthlyBudgets: updatedMonthlyBudgets,
+        activeMonthKey: selectedMonthKey
+      });
 
-    setIsBudgetSaved(true);
-    setTimeout(() => setIsBudgetSaved(false), 3000);
+      setBudgetSaveError(null);
+      setIsBudgetSaved(true);
+      setTimeout(() => setIsBudgetSaved(false), 3000);
+    } catch (error) {
+      setIsBudgetSaved(false);
+      setBudgetSaveError('No se pudo guardar el presupuesto. Verifica tu conexión e inténtalo nuevamente.');
+    }
   };
 
   const getTrafficLight = () => {
@@ -484,6 +491,10 @@ export default function Budget() {
 
             {copyStatusMessage && (
               <p className="mt-2 text-xs font-medium text-certus-blue">{copyStatusMessage}</p>
+            )}
+
+            {budgetSaveError && (
+              <p className="mt-2 text-xs font-medium text-certus-error">{budgetSaveError}</p>
             )}
           </div>
           

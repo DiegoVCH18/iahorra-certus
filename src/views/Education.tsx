@@ -362,8 +362,11 @@ export default function Education() {
 
 function CourseCard({ title, desc, duration, progress, icon, status, recommended, onClick }: { title: string, desc: string, duration: string, progress: number, icon: string, status: 'completed' | 'in-progress' | 'available' | 'locked', recommended?: boolean, onClick?: () => void }) {
   return (
-    <div 
+    <button
+      type="button"
       onClick={onClick}
+      aria-label={`Abrir curso: ${title}`}
+      disabled={status === 'locked'}
       className={cn(
         "bg-white rounded-2xl p-4 shadow-sm border transition-all relative overflow-hidden",
         status === 'locked' ? "border-gray-100 opacity-70" : "border-gray-100 hover:shadow-md cursor-pointer",
@@ -411,6 +414,6 @@ function CourseCard({ title, desc, duration, progress, icon, status, recommended
           ></div>
         </div>
       )}
-    </div>
+    </button>
   );
 }

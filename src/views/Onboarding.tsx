@@ -184,8 +184,10 @@ export default function Onboarding() {
 
 function AgeCard({ icon, title, desc, selected, onClick }: { icon: React.ReactNode, title: string, desc: string, selected: boolean, onClick: () => void }) {
   return (
-    <div 
+    <button
+      type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={cn(
         "flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all",
         selected ? "border-certus-cyan bg-certus-light text-certus-blue" : "border-gray-100 bg-white text-gray-500 hover:border-gray-200"
@@ -196,14 +198,16 @@ function AgeCard({ icon, title, desc, selected, onClick }: { icon: React.ReactNo
       </div>
       <h3 className="font-display font-semibold text-sm">{title}</h3>
       <p className="text-xs opacity-70">{desc}</p>
-    </div>
+    </button>
   );
 }
 
 function OptionCard({ title, selected, onClick }: { title: string, selected: boolean, onClick: () => void }) {
   return (
-    <div 
+    <button
+      type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={cn(
         "p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center",
         selected ? "border-certus-cyan bg-certus-light text-certus-blue font-medium" : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -216,14 +220,16 @@ function OptionCard({ title, selected, onClick }: { title: string, selected: boo
         {selected && <div className="w-2.5 h-2.5 bg-certus-cyan rounded-full" />}
       </div>
       {title}
-    </div>
+    </button>
   );
 }
 
 function GoalCard({ icon, title, selected, onClick }: { icon: React.ReactNode, title: string, selected: boolean, onClick: () => void }) {
   return (
-    <div 
+    <button
+      type="button"
       onClick={onClick}
+      aria-pressed={selected}
       className={cn(
         "p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-4",
         selected ? "border-certus-cyan bg-certus-light text-certus-blue" : "border-gray-100 bg-white text-gray-600 hover:border-gray-200"
@@ -233,6 +239,6 @@ function GoalCard({ icon, title, selected, onClick }: { icon: React.ReactNode, t
         {icon}
       </div>
       <span className="font-display font-semibold text-sm">{title}</span>
-    </div>
+    </button>
   );
 }

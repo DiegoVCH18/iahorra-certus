@@ -19,6 +19,10 @@ export default function Footer({ light }: FooterProps) {
       >
         Ing Diego Armando Vasquez Chavez CIP: 337613
       </a>
+      <br />
+      <span className={light ? 'text-white/50' : 'text-gray-400'}>
+        Docente de Adm. Financiera y Banca Digital en CERTUS
+      </span>
     </div>
   );
 }

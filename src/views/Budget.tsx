@@ -547,15 +547,15 @@ export default function Budget() {
 
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex-1 flex flex-col">
           <h3 className="font-display font-bold text-certus-blue mb-2">Tu Distribución</h3>
-          <div className="h-48 w-full relative flex items-center justify-center flex-1 min-h-[200px]">
+          <div className="h-52 md:h-64 lg:h-72 w-full relative flex items-center justify-center flex-1 min-h-[220px] md:min-h-[260px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={budgetData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
+                  innerRadius="58%"
+                  outerRadius="78%"
                   paddingAngle={5}
                   dataKey="value"
                 >
